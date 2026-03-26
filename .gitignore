@@ -1,0 +1,22 @@
+# Generated outputs
+results/
+report.html
+
+# Compiled binaries
+cpp/build_benchmark
+swift/swift-bench
+go/go-bench
+rust/target/
+
+# Haskell build artifacts
+haskell/dist-newstyle/
+
+# Go module cache
+go/go.sum
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
