@@ -84,7 +84,7 @@ Scored golf-style: each language gets a rank per operation (1 = fastest), lowest
 python3 generate_report.py
 ```
 
-`run_all.sh` detects which languages are available and skips any that aren't installed. Results are written to `results/<lang>_results.json`; the report is written to `report.html`.
+`run_all.sh` detects which languages are available and skips any that aren't installed. Results are written to `results/<lang>_results.json`; the report is written to `index.html`.
 
 ## Building
 
@@ -121,7 +121,7 @@ cd go && go mod tidy && go build -o go-bench .
 
 ## Report
 
-`report.html` is a self-contained file (no server needed — open in any browser). It includes:
+`index.html` is a self-contained file (no server needed — open in any browser). It includes:
 
 - **Executive summary** — winner, gold medals by operation, tier analysis, notable findings
 - **Leaderboard** — golf-scored ranking table with per-op ranks coloured green→red

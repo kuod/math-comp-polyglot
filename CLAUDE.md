@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project does
 
-Benchmarks 12 numerical/linear-algebra operations across Python, R, Julia, Rust, C++, Haskell, Swift, and Go. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `report.html`.
+Benchmarks 12 numerical/linear-algebra operations across Python, R, Julia, Rust, C++, Haskell, Swift, and Go. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `index.html`.
 
 ## Running benchmarks
 
@@ -68,10 +68,10 @@ Uses `gonum.org/v1/gonum` (pure Go, no external LAPACK).
 
 ### Data flow
 ```
-<lang>/benchmark.<ext>  →  results/<lang>_results.json  →  generate_report.py  →  report.html
+<lang>/benchmark.<ext>  →  results/<lang>_results.json  →  generate_report.py  →  index.html
 ```
 
-`results/` and `report.html` are generated outputs and should not be committed.
+`results/` and `index.html` are generated outputs and should not be committed.
 
 ### JSON schema (each `results/*.json`)
 ```json

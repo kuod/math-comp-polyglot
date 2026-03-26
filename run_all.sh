@@ -150,4 +150,4 @@ log "Generating HTML report..."
 cd "$ROOT"
 python3 generate_report.py
 
-log "Done! Open report.html in your browser."
+log "Done! Open index.html in your browser."

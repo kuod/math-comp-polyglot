@@ -1004,6 +1004,6 @@ if __name__ == "__main__":
         sys.exit(1)
     print(f"Loaded results for: {', '.join(data.keys())}")
     html = generate_html(data)
-    out_path = ROOT / "report.html"
+    out_path = ROOT / "index.html"
     out_path.write_text(html, encoding="utf-8")
     print(f"Report written to {out_path}")
