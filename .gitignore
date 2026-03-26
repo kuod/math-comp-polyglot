@@ -1,11 +1,8 @@
-# Generated outputs
-results/
-report.html
-
 # Compiled binaries
 cpp/build_benchmark
 swift/swift-bench
 go/go-bench
+go/go
 rust/target/
 
 # Haskell build artifacts

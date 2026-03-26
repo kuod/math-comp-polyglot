@@ -1,0 +1,103 @@
+{
+  "language": "Swift",
+  "version": "Swift / Accelerate (Apple vDSP+BLAS+LAPACK)",
+  "platform": "macOS arm64",
+  "operations": [
+    {
+      "name": "Matrix Multiply",
+      "description": "1000×1000 dense matrix multiplication (cblas_dgemm)",
+      "mean_ms": 7.759675145149231,
+      "std_ms": 0.23089360489828087,
+      "min_ms": 7.449290990829468,
+      "memory_mb": 7.62939453125
+    },
+    {
+      "name": "Matrix Inverse",
+      "description": "Inversion of 500×500 SPD matrix (dgetrf + dgetri)",
+      "mean_ms": 2.4712584257125854,
+      "std_ms": 0.08487471103962038,
+      "min_ms": 2.3308329582214355,
+      "memory_mb": 1.9073486328125
+    },
+    {
+      "name": "LU Decomposition",
+      "description": "LU factorisation of 500×500 matrix (dgetrf)",
+      "mean_ms": 1.1690457105636596,
+      "std_ms": 0.036390341578062986,
+      "min_ms": 1.1405000686645508,
+      "memory_mb": 1.9073486328125
+    },
+    {
+      "name": "Eigenvalue Decomp",
+      "description": "Full eigendecomposition of 300×300 symmetric matrix (dsyev)",
+      "mean_ms": 20.696237659454347,
+      "std_ms": 0.10963726545874816,
+      "min_ms": 20.556541919708252,
+      "memory_mb": 0.688934326171875
+    },
+    {
+      "name": "Cholesky",
+      "description": "Cholesky factorisation of 500×500 SPD matrix (dpotrf)",
+      "mean_ms": 0.32963762283325193,
+      "std_ms": 0.016382899715679407,
+      "min_ms": 0.31491708755493164,
+      "memory_mb": 1.9073486328125
+    },
+    {
+      "name": "SVD",
+      "description": "Full SVD of 500×300 matrix (dgesdd, thin)",
+      "mean_ms": 14.68335838317871,
+      "std_ms": 0.20038262814210872,
+      "min_ms": 14.464084148406982,
+      "memory_mb": 1.833343505859375
+    },
+    {
+      "name": "Linear System Solve",
+      "description": "Solve Ax=b for 1000×1000 SPD A (dpotrf + dpotrs)",
+      "mean_ms": 3.2903581857681274,
+      "std_ms": 0.2694910188558061,
+      "min_ms": 2.8812499046325684,
+      "memory_mb": 0.00762939453125
+    },
+    {
+      "name": "Vector Dot Product",
+      "description": "Dot product of two 10M-element vectors (cblas_ddot)",
+      "mean_ms": 3.1535876035690307,
+      "std_ms": 0.6220709791682982,
+      "min_ms": 2.6835830211639404,
+      "memory_mb": 7.62939453125e-06
+    },
+    {
+      "name": "Hadamard Product",
+      "description": "Element-wise multiply + add on 1000×1000 matrices (vDSP)",
+      "mean_ms": 1.2243582963943482,
+      "std_ms": 0.16063094447316004,
+      "min_ms": 1.104207992553711,
+      "memory_mb": 7.62939453125
+    },
+    {
+      "name": "QR Decomposition",
+      "description": "QR factorisation of 500×500 matrix (dgeqrf, compact form)",
+      "mean_ms": 2.559837484359741,
+      "std_ms": 0.21797485723416107,
+      "min_ms": 2.375458002090454,
+      "memory_mb": 1.9073486328125
+    },
+    {
+      "name": "FFT (real, 1M)",
+      "description": "Real FFT of 2²⁰=1M-element vector (vDSP Accelerate)",
+      "mean_ms": 22.629333472251894,
+      "std_ms": 2.453654190688977,
+      "min_ms": 20.347333908081055,
+      "memory_mb": 8.000015258789062
+    },
+    {
+      "name": "Sort 10M floats",
+      "description": "Unstable sort of 10M random float64 values (Swift Array.sort)",
+      "mean_ms": 991.1668707370758,
+      "std_ms": 28.395992191353567,
+      "min_ms": 959.1135830879211,
+      "memory_mb": 0.0
+    }
+  ]
+}

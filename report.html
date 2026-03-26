@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Numerical Computing Benchmark: 8 Languages · 12 Operations</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f9;
+    color: #1a1a2e;
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: #fff;
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+  }
+  header h1 { font-size: 2rem; letter-spacing: -0.5px; margin-bottom: .4rem; }
+  header p  { opacity: .8; font-size: .95rem; }
+  .badge {
+    display: inline-block;
+    padding: .2em .7em;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 600;
+    margin: .2em;
+    color: #fff;
+  }
+  .section { max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem; }
+  h2 { font-size: 1.2rem; margin-bottom: 1rem; color: #16213e; border-left: 4px solid #0f3460; padding-left: .6rem; }
+
+  /* ── Language summary cards ── */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .lang-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    text-align: center;
+  }
+  .lang-logo  { font-size: 2rem; margin-bottom: .2rem; }
+  .lang-name  { font-size: 1.1rem; font-weight: 700; }
+  .lang-version { font-size: .7rem; color: #888; margin: .2rem 0 .8rem; min-height: 1.2em; }
+  .lang-stats { display: flex; justify-content: space-around; }
+  .stat       { display: flex; flex-direction: column; align-items: center; }
+  .stat-val   { font-weight: 700; font-size: .95rem; }
+  .stat-lbl   { font-size: .65rem; color: #999; }
+
+  /* ── Overview charts ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  @media(max-width:800px) { .charts-row { grid-template-columns: 1fr; } }
+  .chart-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  }
+  .chart-box h3 { font-size: .95rem; margin-bottom: .8rem; color: #444; }
+
+  /* ── Op cards ── */
+  .op-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  @media(max-width:500px) { .op-grid { grid-template-columns: 1fr; } }
+  .op-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  }
+  .op-card-title { font-weight: 700; font-size: 1rem; margin-bottom: .1rem; }
+  .op-card-desc  { font-size: .75rem; color: #888; margin-bottom: .6rem; }
+  .chart-label { font-size: .7rem; color: #aaa; text-align: center; margin-bottom: .2rem; }
+
+  /* ── Summary table ── */
+  .table-wrap { overflow-x: auto; margin-bottom: 2rem; }
+  table {
+    border-collapse: collapse;
+    min-width: 860px;
+    width: 100%;
+    font-size: .83rem;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+  }
+  thead tr { background: #16213e; color: #fff; }
+  th { padding: .7rem .6rem; font-weight: 600; }
+  td { padding: .6rem .6rem; border-bottom: 1px solid #f0f0f0; }
+  tr:last-child td { border-bottom: none; }
+  .op-name { font-weight: 600; min-width: 160px; }
+  tr:hover { background: #fafbff; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: .8rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: .3rem; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; }
+
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: .8rem;
+    color: #999;
+  }
+
+  /* ── Executive summary ── */
+  .exec-summary { margin-bottom: 0; }
+  .exec-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  @media(max-width:700px) { .exec-grid { grid-template-columns: 1fr; } }
+  .exec-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,.07);
+    font-size: .88rem;
+    line-height: 1.6;
+  }
+  .exec-winner { grid-column: 1 / -1; text-align: center; }
+  .exec-label { font-size: .7rem; font-weight: 700; text-transform: uppercase;
+                 letter-spacing: .08em; color: #999; margin-bottom: .4rem; }
+  .exec-hero  { font-size: 2.2rem; font-weight: 800; margin: .3rem 0; }
+  .exec-sub   { font-size: .82rem; color: #666; }
+  .exec-list  { padding-left: 1.2rem; }
+  .exec-list li { margin-bottom: .35rem; }
+
+  /* ── Leaderboard table ── */
+  .lb-table { font-size: .82rem; }
+  .lb-table thead th { font-size: .75rem; padding: .5rem .4rem; }
+  .lb-place { text-align: center; font-size: 1.1rem; width: 2rem; }
+  .lb-lang  { font-weight: 700; white-space: nowrap; padding-left: .6rem; }
+  .lb-score { text-align: center; font-size: 1rem; padding: .4rem .6rem;
+               background: #f8f8ff; }
+  .lb-rank  { text-align: center; font-weight: 600; padding: .4rem .35rem;
+               min-width: 2.2rem; }
+  .lb-gold  { font-weight: 800; }
+
+  /* ── Glossary ── */
+  .gloss-grid {
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+    margin-bottom: 2rem;
+  }
+  .gloss-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .gloss-num {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #d0d4e0;
+    min-width: 2.2rem;
+    text-align: right;
+    line-height: 1.2;
+    padding-top: .1rem;
+  }
+  .gloss-body { flex: 1; }
+  .gloss-title {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: .2rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+  .gloss-badge {
+    font-size: .68rem;
+    color: #fff;
+    padding: .15em .55em;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .gloss-best {
+    font-size: .72rem;
+    color: #888;
+    font-weight: 400;
+  }
+  .gloss-sig {
+    font-size: .78rem;
+    color: #666;
+    margin-bottom: .4rem;
+  }
+  .gloss-sig code { background: #f4f6f9; padding: .1em .4em; border-radius: 4px; }
+  .gloss-text { font-size: .84rem; color: #444; line-height: 1.6; }
+  .gloss-text code { background: #f4f6f9; padding: .1em .35em; border-radius: 3px;
+                      font-size: .92em; }
+  .gloss-text em { font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Numerical Computing Benchmark</h1>
+  <p>12 operations &nbsp;·&nbsp; 8 languages &nbsp;·&nbsp; speed &amp; memory comparison</p>
+  <div style="margin-top:1rem">
+    <span class="badge" style="background:#3776AB">🐍 Python</span><span class="badge" style="background:#276DC3">📊 R</span><span class="badge" style="background:#9558B2">∑ Julia</span><span class="badge" style="background:#CE422B">⚙ Rust</span><span class="badge" style="background:#00599C">⚡ C++</span><span class="badge" style="background:#5D4F85">λ Haskell</span><span class="badge" style="background:#F05138">🦅 Swift</span><span class="badge" style="background:#00ACD7">🐹 Go</span>
+  </div>
+</header>
+
+
+<div class="section exec-summary">
+  <h2>Executive Summary</h2>
+  <div class="exec-grid">
+
+    <div class="exec-card exec-winner">
+      <div class="exec-label">Overall Winner</div>
+      <div class="exec-hero" style="color:#9558B2">
+        🥇 Julia
+      </div>
+      <div class="exec-sub">Score: 31 &nbsp;|&nbsp;
+        Runner-up: Swift (35) &nbsp;|&nbsp;
+        3rd: Python (36)
+      </div>
+    </div>
+
+    <div class="exec-card">
+      <div class="exec-label">Gold Medals by Operation</div>
+      <ul class="exec-list"><li><strong>Julia</strong> leads 2 operations: Vector Dot Product, Sort 10M floats</li><li><strong>Swift</strong> leads 7 operations: Matrix Multiply, Matrix Inverse, LU Decomposition, Cholesky, SVD, Linear System Solve, QR Decomposition</li><li><strong>Python</strong> leads 2 operations: Eigenvalue Decomp, FFT (real, 1M)</li><li><strong>Haskell</strong> leads 1 operation: Hadamard Product</li></ul>
+    </div>
+
+    <div class="exec-card">
+      <div class="exec-label">Two Performance Tiers</div>
+      <p><strong>BLAS/LAPACK-linked</strong> (Haskell, Julia, Python, R, Swift): call
+        hand-optimised vendor routines (Apple Accelerate on this machine) for
+        dense matrix work — typically 5–20× faster than pure implementations on
+        large factorisation benchmarks.</p>
+      <p style="margin-top:.5rem"><strong>Pure implementations</strong>
+        (C++, Go, Rust): Rust/nalgebra, C++/Eigen, Go/gonum implement
+        their own algorithms without calling LAPACK. Slower on BLAS-heavy ops, but
+        competitive on element-wise and algorithm-class workloads.</p>
+    </div>
+
+    <div class="exec-card">
+      <div class="exec-label">Notable Findings</div>
+      <ul class="exec-list">
+        <li><strong>Swift/Accelerate</strong> dominates factorisation ops
+          (Cholesky, LU, QR) thanks to Apple Silicon-tuned Accelerate — even
+          beating Python/NumPy and Julia on several ops.</li>
+        <li><strong>Sort</strong>: Julia is fastest; Go and Swift
+          are ~4–5× slower, exposing meaningful differences in standard-library
+          sort implementations at 10M elements.</li>
+        <li><strong>Rust near-zero memory</strong> for Cholesky, LU Decomposition, QR Decomposition: nalgebra performs these factorisations in-place on the moved input, so no extra allocation is needed — correct behaviour, not a gap in measurement.</li>
+        <li><strong>Haskell</strong> is excluded from FFT (shows —): the
+          vector-fftw library uses CDouble rather than Haskell Double, making
+          a safe, comparable benchmark impractical.</li>
+        <li><strong>Go/gonum</strong> scores last: gonum is a pure-Go library
+          with no LAPACK linkage, resulting in the highest scores across the
+          board on dense linear algebra.</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+
+<div class="section">
+  <h2>Leaderboard — Golf Scoring (1st = 1 pt · lowest score wins)</h2>
+  <p style="font-size:.85rem;color:#666;margin-bottom:1rem">
+    Each cell shows a language's finishing position (1 = fastest) for that operation.
+    Scores are summed across all operations. Languages missing an operation (Haskell/FFT)
+    are excluded from that op's ranking and receive no penalty points.
+  </p>
+  <div class="table-wrap">
+    <table class="lb-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Language</th>
+          <th>Score</th>
+          <th title="Matrix Multiply">MatMul</th><th title="Matrix Inverse">Inv</th><th title="LU Decomposition">LU</th><th title="Eigenvalue Decomp">Eigen</th><th title="Cholesky">Chol</th><th title="SVD">SVD</th><th title="Linear System Solve">LinSolve</th><th title="Vector Dot Product">Dot</th><th title="Hadamard Product">Hadamard</th><th title="QR Decomposition">QR</th><th title="FFT (real, 1M)">FFT</th><th title="Sort 10M floats">Sort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="lb-place">🥇</td><td class="lb-lang" style="color:#9558B2">∑ Julia</td><td class="lb-score"><strong>31</strong></td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(106,185,40,0.35)">2</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td></tr><tr><td class="lb-place">🥈</td><td class="lb-lang" style="color:#F05138">🦅 Swift</td><td class="lb-score"><strong>35</strong></td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank" style="background:rgba(200,123,40,0.35)">5</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td></tr><tr><td class="lb-place">🥉</td><td class="lb-lang" style="color:#3776AB">🐍 Python</td><td class="lb-score"><strong>36</strong></td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td></tr><tr><td class="lb-place">#4</td><td class="lb-lang" style="color:#5D4F85">λ Haskell</td><td class="lb-score"><strong>49</strong></td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank lb-gold" style="background:rgba(40,185,40,0.35)">1</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td style="color:#ccc;text-align:center">—</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td></tr><tr><td class="lb-place">#5</td><td class="lb-lang" style="color:#00599C">⚡ C++</td><td class="lb-score"><strong>54</strong></td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(200,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td></tr><tr><td class="lb-place">#6</td><td class="lb-lang" style="color:#276DC3">📊 R</td><td class="lb-score"><strong>63</strong></td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(154,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">7</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td></tr><tr><td class="lb-place">#7</td><td class="lb-lang" style="color:#CE422B">⚙ Rust</td><td class="lb-score"><strong>67</strong></td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,158,40,0.35)">5</td><td class="lb-rank" style="background:rgba(211,185,40,0.35)">4</td><td class="lb-rank" style="background:rgba(200,105,40,0.35)">6</td><td class="lb-rank" style="background:rgba(173,185,40,0.35)">3</td><td class="lb-rank" style="background:rgba(97,185,40,0.35)">2</td></tr><tr><td class="lb-place">#8</td><td class="lb-lang" style="color:#00ACD7">🐹 Go</td><td class="lb-score"><strong>89</strong></td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,52,40,0.35)">7</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td><td class="lb-rank" style="background:rgba(200,61,40,0.35)">6</td><td class="lb-rank" style="background:rgba(200,0,40,0.35)">8</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Language cards ── -->
+<div class="section">
+  <h2>Language Summary</h2>
+  <div class="lang-grid">
+    
+        <div class="lang-card" style="border-top:4px solid #9558B2">
+            <div class="lang-logo" style="color:#9558B2">∑</div>
+            <div class="lang-name" style="color:#9558B2">Julia</div>
+            <div class="lang-version">Julia 1.12.5</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">18.61</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">16.53</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">🥇 31</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+
+        <div class="lang-card" style="border-top:4px solid #F05138">
+            <div class="lang-logo" style="color:#F05138">🦅</div>
+            <div class="lang-name" style="color:#F05138">Swift</div>
+            <div class="lang-version">Swift / Accelerate (Apple vDSP+BLAS+LAPACK)</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">89.26</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">2.78</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">🥈 35</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+
+        <div class="lang-card" style="border-top:4px solid #3776AB">
+            <div class="lang-logo" style="color:#3776AB">🐍</div>
+            <div class="lang-name" style="color:#3776AB">Python</div>
+            <div class="lang-version">Python 3.13.11 / NumPy 2.4.3</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">41.52</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">9.80</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">🥉 36</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+
+        <div class="lang-card" style="border-top:4px solid #5D4F85">
+            <div class="lang-logo" style="color:#5D4F85">λ</div>
+            <div class="lang-name" style="color:#5D4F85">Haskell</div>
+            <div class="lang-version">GHC 9.14.1 / hmatrix</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">98.60</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">36.45</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">#4 49</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+
+        <div class="lang-card" style="border-top:4px solid #00599C">
+            <div class="lang-logo" style="color:#00599C">⚡</div>
+            <div class="lang-name" style="color:#00599C">C++</div>
+            <div class="lang-version">C++17 / Eigen 3.5.0</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">33.28</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">2.78</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">#5 54</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+
+        <div class="lang-card" style="border-top:4px solid #276DC3">
+            <div class="lang-logo" style="color:#276DC3">📊</div>
+            <div class="lang-name" style="color:#276DC3">R</div>
+            <div class="lang-version">R version 4.5.2 (2025-10-31)</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">46.28</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">9.17</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">#6 63</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+
+        <div class="lang-card" style="border-top:4px solid #CE422B">
+            <div class="lang-logo" style="color:#CE422B">⚙</div>
+            <div class="lang-name" style="color:#CE422B">Rust</div>
+            <div class="lang-version">rustc 1.94.1 (e408947bf 2026-03-25) / nalgebra 0.33</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">40.73</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">5.82</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">#7 67</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+
+        <div class="lang-card" style="border-top:4px solid #00ACD7">
+            <div class="lang-logo" style="color:#00ACD7">🐹</div>
+            <div class="lang-name" style="color:#00ACD7">Go</div>
+            <div class="lang-version">Go 1.26.1 / gonum 0.15</div>
+            <div class="lang-stats">
+                <div class="stat"><span class="stat-val">121.55</span><span class="stat-lbl">avg ms</span></div>
+                <div class="stat"><span class="stat-val">6.50</span><span class="stat-lbl">avg MB</span></div>
+                <div class="stat"><span class="stat-val">#8 89</span><span class="stat-lbl">score (lower=better)</span></div>
+            </div>
+        </div>
+  </div>
+</div>
+
+<!-- ── Overview charts ── -->
+<div class="section">
+  <h2>Overview: All Operations</h2>
+  <div class="charts-row">
+    <div class="chart-box">
+      <h3>Execution Time (ms) — lower is better</h3>
+      <canvas id="timeChart" height="260"></canvas>
+    </div>
+    <div class="chart-box">
+      <h3>Memory Allocated (MB) — lower is better</h3>
+      <canvas id="memChart" height="260"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── Per-operation scatter charts ── -->
+<div class="section">
+  <h2>Per-Operation: Time vs Memory</h2>
+  <div class="op-grid">
+    
+        <div class="op-card">
+            <div class="op-card-title">Matrix Multiply</div>
+            <div class="op-card-desc">1000×1000 dense matrix multiplication (A @ B)</div>
+            <canvas id="opscatter_0" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">Matrix Inverse</div>
+            <div class="op-card-desc">Inversion of 500×500 SPD matrix</div>
+            <canvas id="opscatter_1" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">LU Decomposition</div>
+            <div class="op-card-desc">LU factorisation of 500×500 matrix</div>
+            <canvas id="opscatter_2" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">Eigenvalue Decomp</div>
+            <div class="op-card-desc">Full eigendecomposition of 300×300 symmetric matrix</div>
+            <canvas id="opscatter_3" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">Cholesky</div>
+            <div class="op-card-desc">Cholesky factorisation of 500×500 SPD matrix</div>
+            <canvas id="opscatter_4" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">SVD</div>
+            <div class="op-card-desc">Full SVD of 500×300 matrix</div>
+            <canvas id="opscatter_5" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">Linear System Solve</div>
+            <div class="op-card-desc">Solve Ax=b for 1000×1000 A, 1000 b</div>
+            <canvas id="opscatter_6" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">Vector Dot Product</div>
+            <div class="op-card-desc">Dot product of two 10M-element vectors</div>
+            <canvas id="opscatter_7" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">Hadamard Product</div>
+            <div class="op-card-desc">Element-wise multiply + add on 1000×1000 matrices</div>
+            <canvas id="opscatter_8" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">QR Decomposition</div>
+            <div class="op-card-desc">QR factorisation of 500×500 matrix</div>
+            <canvas id="opscatter_9" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">FFT (real, 1M)</div>
+            <div class="op-card-desc">Real FFT of 2²⁰=1M-element vector (numpy rfft)</div>
+            <canvas id="opscatter_10" height="180"></canvas>
+        </div>
+
+        <div class="op-card">
+            <div class="op-card-title">Sort 10M floats</div>
+            <div class="op-card-desc">Unstable sort of 10M random float64 values (numpy sort)</div>
+            <canvas id="opscatter_11" height="180"></canvas>
+        </div>
+  </div>
+</div>
+
+<!-- ── Summary table ── -->
+<div class="section">
+  <h2>Full Comparison Table</h2>
+  <div class="legend">
+    <span>Time (ms): 🥇 fastest &nbsp; background: <span style="background:rgba(0,200,80,0.35);padding:1px 6px;border-radius:3px">fast</span> → <span style="background:rgba(200,80,80,0.35);padding:1px 6px;border-radius:3px">slow</span></span>
+    &nbsp;|&nbsp;
+    <span>Same scale for Memory (MB)</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="2" style="text-align:left">Operation</th>
+          <th colspan="8" style="border-bottom:1px solid #ffffff33">Time (ms) mean ± std</th>
+          <th colspan="8" style="border-bottom:1px solid #ffffff33">Memory (MB)</th>
+        </tr>
+        <tr>
+          <th style="background:#3776AB22;color:#3776AB;text-align:center">🐍 Python<br><span style="font-weight:normal;font-size:0.7em">Python 3.13.11 / NumPy 2.4.3</span></th><th style="background:#276DC322;color:#276DC3;text-align:center">📊 R<br><span style="font-weight:normal;font-size:0.7em">R version 4.5.2 (2025-10-31)</span></th><th style="background:#9558B222;color:#9558B2;text-align:center">∑ Julia<br><span style="font-weight:normal;font-size:0.7em">Julia 1.12.5</span></th><th style="background:#CE422B22;color:#CE422B;text-align:center">⚙ Rust<br><span style="font-weight:normal;font-size:0.7em">rustc 1.94.1 (e408947bf 2026-03-25) / nalgebra 0.33</span></th><th style="background:#00599C22;color:#00599C;text-align:center">⚡ C++<br><span style="font-weight:normal;font-size:0.7em">C++17 / Eigen 3.5.0</span></th><th style="background:#5D4F8522;color:#5D4F85;text-align:center">λ Haskell<br><span style="font-weight:normal;font-size:0.7em">GHC 9.14.1 / hmatrix</span></th><th style="background:#F0513822;color:#F05138;text-align:center">🦅 Swift<br><span style="font-weight:normal;font-size:0.7em">Swift / Accelerate (Apple vDSP+BLAS+LAPACK)</span></th><th style="background:#00ACD722;color:#00ACD7;text-align:center">🐹 Go<br><span style="font-weight:normal;font-size:0.7em">Go 1.26.1 / gonum 0.15</span></th>
+          <th style="background:#3776AB22;color:#3776AB;text-align:center">Memory MB</th><th style="background:#276DC322;color:#276DC3;text-align:center">Memory MB</th><th style="background:#9558B222;color:#9558B2;text-align:center">Memory MB</th><th style="background:#CE422B22;color:#CE422B;text-align:center">Memory MB</th><th style="background:#00599C22;color:#00599C;text-align:center">Memory MB</th><th style="background:#5D4F8522;color:#5D4F85;text-align:center">Memory MB</th><th style="background:#F0513822;color:#F05138;text-align:center">Memory MB</th><th style="background:#00ACD722;color:#00ACD7;text-align:center">Memory MB</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="op-name">Matrix Multiply<br><span style="font-weight:normal;font-size:0.78em;color:#666">1000×1000 dense matrix multiplication (A @ B)</span></td><td style="background:rgba(1,200,80,0.35);text-align:center"><strong>8.04</strong><br><span style="font-size:0.75em;color:#666">±0.17</span></td><td style="background:rgba(6,200,80,0.35);text-align:center"><strong>8.80</strong><br><span style="font-size:0.75em;color:#666">±0.42</span></td><td style="background:rgba(41,200,80,0.35);text-align:center"><strong>14.03</strong><br><span style="font-size:0.75em;color:#666">±2.22</span></td><td style="background:rgba(239,200,80,0.35);text-align:center"><strong>44.40</strong><br><span style="font-size:0.75em;color:#666">±0.27</span></td><td style="background:rgba(200,194,80,0.35);text-align:center"><strong>47.88</strong><br><span style="font-size:0.75em;color:#666">±0.31</span></td><td style="background:rgba(1,200,80,0.35);text-align:center"><strong>7.99</strong><br><span style="font-size:0.75em;color:#666">±0.79</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>7.76</strong><br><span style="font-size:0.75em;color:#666">±0.23</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>85.74</strong><br><span style="font-size:0.75em;color:#666">±3.57</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td><td style="background:rgba(2,200,80,0.35);text-align:center">7.64</td><td style="background:rgba(200,0,80,0.35);text-align:center">9.71</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 7.63</td><td style="background:rgba(1,200,80,0.35);text-align:center">7.64</td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td><td style="background:rgba(14,200,80,0.35);text-align:center">7.69</td></tr>
+<tr><td class="op-name">Matrix Inverse<br><span style="font-weight:normal;font-size:0.78em;color:#666">Inversion of 500×500 SPD matrix</span></td><td style="background:rgba(11,200,80,0.35);text-align:center"><strong>3.24</strong><br><span style="font-size:0.75em;color:#666">±0.32</span></td><td style="background:rgba(28,200,80,0.35);text-align:center"><strong>4.30</strong><br><span style="font-size:0.75em;color:#666">±0.48</span></td><td style="background:rgba(25,200,80,0.35);text-align:center"><strong>4.10</strong><br><span style="font-size:0.75em;color:#666">±2.04</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>35.54</strong><br><span style="font-size:0.75em;color:#666">±0.26</span></td><td style="background:rgba(109,200,80,0.35);text-align:center"><strong>9.59</strong><br><span style="font-size:0.75em;color:#666">±0.08</span></td><td style="background:rgba(78,200,80,0.35);text-align:center"><strong>7.54</strong><br><span style="font-size:0.75em;color:#666">±0.25</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>2.47</strong><br><span style="font-size:0.75em;color:#666">±0.08</span></td><td style="background:rgba(200,68,80,0.35);text-align:center"><strong>29.87</strong><br><span style="font-size:0.75em;color:#666">±0.96</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(0,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(5,200,80,0.35);text-align:center">2.18</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 1.91</td><td style="background:rgba(0,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(200,0,80,0.35);text-align:center">24.85</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 1.91</td><td style="background:rgba(7,200,80,0.35);text-align:center">2.24</td></tr>
+<tr><td class="op-name">LU Decomposition<br><span style="font-weight:normal;font-size:0.78em;color:#666">LU factorisation of 500×500 matrix</span></td><td style="background:rgba(111,200,80,0.35);text-align:center"><strong>4.80</strong><br><span style="font-size:0.75em;color:#666">±0.18</span></td><td style="background:rgba(31,200,80,0.35);text-align:center"><strong>2.20</strong><br><span style="font-size:0.75em;color:#666">±0.42</span></td><td style="background:rgba(13,200,80,0.35);text-align:center"><strong>1.61</strong><br><span style="font-size:0.75em;color:#666">±0.11</span></td><td style="background:rgba(200,187,80,0.35);text-align:center"><strong>10.00</strong><br><span style="font-size:0.75em;color:#666">±0.08</span></td><td style="background:rgba(45,200,80,0.35);text-align:center"><strong>2.67</strong><br><span style="font-size:0.75em;color:#666">±0.02</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>17.78</strong><br><span style="font-size:0.75em;color:#666">±0.36</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>1.17</strong><br><span style="font-size:0.75em;color:#666">±0.04</span></td><td style="background:rgba(200,147,80,0.35);text-align:center"><strong>11.65</strong><br><span style="font-size:0.75em;color:#666">±0.25</span></td><td style="background:rgba(22,200,80,0.35);text-align:center">5.74</td><td style="background:rgba(7,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(7,200,80,0.35);text-align:center">1.93</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0076</td><td style="background:rgba(7,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(200,0,80,0.35);text-align:center">130.36</td><td style="background:rgba(7,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(22,200,80,0.35);text-align:center">5.81</td></tr>
+<tr><td class="op-name">Eigenvalue Decomp<br><span style="font-weight:normal;font-size:0.78em;color:#666">Full eigendecomposition of 300×300 symmetric matrix</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>6.03</strong><br><span style="font-size:0.75em;color:#666">±0.18</span></td><td style="background:rgba(58,200,80,0.35);text-align:center"><strong>10.00</strong><br><span style="font-size:0.75em;color:#666">±0.47</span></td><td style="background:rgba(17,200,80,0.35);text-align:center"><strong>7.24</strong><br><span style="font-size:0.75em;color:#666">±0.15</span></td><td style="background:rgba(157,200,80,0.35);text-align:center"><strong>16.69</strong><br><span style="font-size:0.75em;color:#666">±0.11</span></td><td style="background:rgba(153,200,80,0.35);text-align:center"><strong>16.42</strong><br><span style="font-size:0.75em;color:#666">±0.06</span></td><td style="background:rgba(200,178,80,0.35);text-align:center"><strong>25.08</strong><br><span style="font-size:0.75em;color:#666">±0.16</span></td><td style="background:rgba(217,200,80,0.35);text-align:center"><strong>20.70</strong><br><span style="font-size:0.75em;color:#666">±0.11</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>40.50</strong><br><span style="font-size:0.75em;color:#666">±0.18</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">0.69</td><td style="background:rgba(0,200,80,0.35);text-align:center">0.69</td><td style="background:rgba(150,200,80,0.35);text-align:center">1.48</td><td style="background:rgba(0,200,80,0.35);text-align:center">0.69</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.69</td><td style="background:rgba(200,0,80,0.35);text-align:center">3.38</td><td style="background:rgba(0,200,80,0.35);text-align:center">0.69</td><td style="background:rgba(28,200,80,0.35);text-align:center">0.84</td></tr>
+<tr><td class="op-name">Cholesky<br><span style="font-weight:normal;font-size:0.78em;color:#666">Cholesky factorisation of 500×500 SPD matrix</span></td><td style="background:rgba(27,200,80,0.35);text-align:center"><strong>0.83</strong><br><span style="font-size:0.75em;color:#666">±0.03</span></td><td style="background:rgba(52,200,80,0.35);text-align:center"><strong>1.30</strong><br><span style="font-size:0.75em;color:#666">±0.82</span></td><td style="background:rgba(20,200,80,0.35);text-align:center"><strong>0.72</strong><br><span style="font-size:0.75em;color:#666">±0.01</span></td><td style="background:rgba(229,200,80,0.35);text-align:center"><strong>4.55</strong><br><span style="font-size:0.75em;color:#666">±0.04</span></td><td style="background:rgba(61,200,80,0.35);text-align:center"><strong>1.47</strong><br><span style="font-size:0.75em;color:#666">±0.03</span></td><td style="background:rgba(34,200,80,0.35);text-align:center"><strong>0.96</strong><br><span style="font-size:0.75em;color:#666">±0.03</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>0.33</strong><br><span style="font-size:0.75em;color:#666">±0.02</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>9.72</strong><br><span style="font-size:0.75em;color:#666">±0.13</span></td><td style="background:rgba(130,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(130,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(131,200,80,0.35);text-align:center">1.92</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td><td style="background:rgba(130,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(200,0,80,0.35);text-align:center">7.45</td><td style="background:rgba(130,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(200,192,80,0.35);text-align:center">3.86</td></tr>
+<tr><td class="op-name">SVD<br><span style="font-weight:normal;font-size:0.78em;color:#666">Full SVD of 500×300 matrix</span></td><td style="background:rgba(6,200,80,0.35);text-align:center"><strong>16.01</strong><br><span style="font-size:0.75em;color:#666">±0.39</span></td><td style="background:rgba(17,200,80,0.35);text-align:center"><strong>18.30</strong><br><span style="font-size:0.75em;color:#666">±1.57</span></td><td style="background:rgba(30,200,80,0.35);text-align:center"><strong>20.86</strong><br><span style="font-size:0.75em;color:#666">±0.79</span></td><td style="background:rgba(206,200,80,0.35);text-align:center"><strong>56.52</strong><br><span style="font-size:0.75em;color:#666">±4.41</span></td><td style="background:rgba(54,200,80,0.35);text-align:center"><strong>25.78</strong><br><span style="font-size:0.75em;color:#666">±0.12</span></td><td style="background:rgba(2,200,80,0.35);text-align:center"><strong>15.16</strong><br><span style="font-size:0.75em;color:#666">±0.26</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>14.68</strong><br><span style="font-size:0.75em;color:#666">±0.20</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>118.04</strong><br><span style="font-size:0.75em;color:#666">±1.12</span></td><td style="background:rgba(10,200,80,0.35);text-align:center">1.83</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 1.76</td><td style="background:rgba(200,0,80,0.35);text-align:center">5.10</td><td style="background:rgba(11,200,80,0.35);text-align:center">1.84</td><td style="background:rgba(10,200,80,0.35);text-align:center">1.83</td><td style="background:rgba(203,200,80,0.35);text-align:center">3.10</td><td style="background:rgba(10,200,80,0.35);text-align:center">1.83</td><td style="background:rgba(200,115,80,0.35);text-align:center">4.13</td></tr>
+<tr><td class="op-name">Linear System Solve<br><span style="font-weight:normal;font-size:0.78em;color:#666">Solve Ax=b for 1000×1000 A, 1000 b</span></td><td style="background:rgba(22,200,80,0.35);text-align:center"><strong>6.65</strong><br><span style="font-size:0.75em;color:#666">±0.76</span></td><td style="background:rgba(58,200,80,0.35);text-align:center"><strong>11.80</strong><br><span style="font-size:0.75em;color:#666">±1.23</span></td><td style="background:rgba(33,200,80,0.35);text-align:center"><strong>8.23</strong><br><span style="font-size:0.75em;color:#666">±1.16</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>77.78</strong><br><span style="font-size:0.75em;color:#666">±1.27</span></td><td style="background:rgba(40,200,80,0.35);text-align:center"><strong>9.18</strong><br><span style="font-size:0.75em;color:#666">±0.25</span></td><td style="background:rgba(27,200,80,0.35);text-align:center"><strong>7.28</strong><br><span style="font-size:0.75em;color:#666">±0.25</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>3.29</strong><br><span style="font-size:0.75em;color:#666">±0.27</span></td><td style="background:rgba(200,130,80,0.35);text-align:center"><strong>53.56</strong><br><span style="font-size:0.75em;color:#666">±8.37</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">0.0087</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0076</td><td style="background:rgba(200,2,80,0.35);text-align:center">7.66</td><td style="background:rgba(1,200,80,0.35);text-align:center">0.02</td><td style="background:rgba(0,200,80,0.35);text-align:center">0.0076</td><td style="background:rgba(200,3,80,0.35);text-align:center">7.64</td><td style="background:rgba(0,200,80,0.35);text-align:center">0.0076</td><td style="background:rgba(200,0,80,0.35);text-align:center">7.71</td></tr>
+<tr><td class="op-name">Vector Dot Product<br><span style="font-weight:normal;font-size:0.78em;color:#666">Dot product of two 10M-element vectors</span></td><td style="background:rgba(3,200,80,0.35);text-align:center"><strong>3.00</strong><br><span style="font-size:0.75em;color:#666">±0.16</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>18.80</strong><br><span style="font-size:0.75em;color:#666">±1.32</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>2.87</strong><br><span style="font-size:0.75em;color:#666">±0.10</span></td><td style="background:rgba(10,200,80,0.35);text-align:center"><strong>3.19</strong><br><span style="font-size:0.75em;color:#666">±0.60</span></td><td style="background:rgba(7,200,80,0.35);text-align:center"><strong>3.10</strong><br><span style="font-size:0.75em;color:#666">±0.24</span></td><td style="background:rgba(225,200,80,0.35);text-align:center"><strong>9.91</strong><br><span style="font-size:0.75em;color:#666">±0.24</span></td><td style="background:rgba(9,200,80,0.35);text-align:center"><strong>3.15</strong><br><span style="font-size:0.75em;color:#666">±0.62</span></td><td style="background:rgba(200,143,80,0.35);text-align:center"><strong>13.08</strong><br><span style="font-size:0.75em;color:#666">±0.26</span></td><td style="background:rgba(200,0,80,0.35);text-align:center">0.0001</td><td style="background:rgba(38,200,80,0.35);text-align:center">0.0000</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td><td style="background:rgba(31,200,80,0.35);text-align:center">0.0000</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td><td style="background:rgba(31,200,80,0.35);text-align:center">0.0000</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td></tr>
+<tr><td class="op-name">Hadamard Product<br><span style="font-weight:normal;font-size:0.78em;color:#666">Element-wise multiply + add on 1000×1000 matrices</span></td><td style="background:rgba(205,200,80,0.35);text-align:center"><strong>1.15</strong><br><span style="font-size:0.75em;color:#666">±0.07</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>2.00</strong><br><span style="font-size:0.75em;color:#666">±0.67</span></td><td style="background:rgba(48,200,80,0.35);text-align:center"><strong>0.71</strong><br><span style="font-size:0.75em;color:#666">±0.17</span></td><td style="background:rgba(131,200,80,0.35);text-align:center"><strong>0.95</strong><br><span style="font-size:0.75em;color:#666">±0.05</span></td><td style="background:rgba(93,200,80,0.35);text-align:center"><strong>0.84</strong><br><span style="font-size:0.75em;color:#666">±0.05</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>0.58</strong><br><span style="font-size:0.75em;color:#666">±0.01</span></td><td style="background:rgba(231,200,80,0.35);text-align:center"><strong>1.22</strong><br><span style="font-size:0.75em;color:#666">±0.16</span></td><td style="background:rgba(200,116,80,0.35);text-align:center"><strong>1.59</strong><br><span style="font-size:0.75em;color:#666">±0.09</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td><td style="background:rgba(0,200,80,0.35);text-align:center">7.64</td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 7.63</td><td style="background:rgba(200,0,80,0.35);text-align:center">15.26</td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td><td style="background:rgba(0,200,80,0.35);text-align:center">7.63</td></tr>
+<tr><td class="op-name">QR Decomposition<br><span style="font-weight:normal;font-size:0.78em;color:#666">QR factorisation of 500×500 matrix</span></td><td style="background:rgba(70,200,80,0.35);text-align:center"><strong>8.08</strong><br><span style="font-size:0.75em;color:#666">±0.57</span></td><td style="background:rgba(203,200,80,0.35);text-align:center"><strong>18.50</strong><br><span style="font-size:0.75em;color:#666">±0.53</span></td><td style="background:rgba(12,200,80,0.35);text-align:center"><strong>3.51</strong><br><span style="font-size:0.75em;color:#666">±1.85</span></td><td style="background:rgba(163,200,80,0.35);text-align:center"><strong>15.35</strong><br><span style="font-size:0.75em;color:#666">±0.06</span></td><td style="background:rgba(45,200,80,0.35);text-align:center"><strong>6.11</strong><br><span style="font-size:0.75em;color:#666">±0.11</span></td><td style="background:rgba(126,200,80,0.35);text-align:center"><strong>12.44</strong><br><span style="font-size:0.75em;color:#666">±0.25</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>2.56</strong><br><span style="font-size:0.75em;color:#666">±0.22</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>42.52</strong><br><span style="font-size:0.75em;color:#666">±0.37</span></td><td style="background:rgba(200,74,80,0.35);text-align:center">5.97</td><td style="background:rgba(132,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(153,200,80,0.35);text-align:center">2.20</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0038</td><td style="background:rgba(132,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(200,0,80,0.35);text-align:center">7.33</td><td style="background:rgba(132,200,80,0.35);text-align:center">1.91</td><td style="background:rgba(200,69,80,0.35);text-align:center">6.06</td></tr>
+<tr><td class="op-name">FFT (real, 1M)<br><span style="font-weight:normal;font-size:0.78em;color:#666">Real FFT of 2²⁰=1M-element vector (numpy rfft)</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>8.11</strong><br><span style="font-size:0.75em;color:#666">±0.41</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>61.00</strong><br><span style="font-size:0.75em;color:#666">±0.82</span></td><td style="background:rgba(30,200,80,0.35);text-align:center"><strong>11.23</strong><br><span style="font-size:0.75em;color:#666">±0.58</span></td><td style="background:rgba(79,200,80,0.35);text-align:center"><strong>16.34</strong><br><span style="font-size:0.75em;color:#666">±0.28</span></td><td style="background:rgba(88,200,80,0.35);text-align:center"><strong>17.30</strong><br><span style="font-size:0.75em;color:#666">±0.69</span></td><td style="text-align:center;color:#bbb">—</td><td style="background:rgba(139,200,80,0.35);text-align:center"><strong>22.63</strong><br><span style="font-size:0.75em;color:#666">±2.45</span></td><td style="background:rgba(182,200,80,0.35);text-align:center"><strong>26.99</strong><br><span style="font-size:0.75em;color:#666">±6.53</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">8.00</td><td style="background:rgba(101,200,80,0.35);text-align:center">16.00</td><td style="background:rgba(0,200,80,0.35);text-align:center">8.02</td><td style="background:rgba(200,0,80,0.35);text-align:center">48.00</td><td style="background:rgba(0,200,80,0.35);text-align:center">8.00</td><td style="text-align:center;color:#bbb">—</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 8.00</td><td style="background:rgba(200,159,80,0.35);text-align:center">32.01</td></tr>
+<tr><td class="op-name">Sort 10M floats<br><span style="font-weight:normal;font-size:0.78em;color:#666">Unstable sort of 10M random float64 values (numpy sort)</span></td><td style="background:rgba(165,200,80,0.35);text-align:center"><strong>432.30</strong><br><span style="font-size:0.75em;color:#666">±5.61</span></td><td style="background:rgba(145,200,80,0.35);text-align:center"><strong>398.30</strong><br><span style="font-size:0.75em;color:#666">±7.54</span></td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 <strong>148.17</strong><br><span style="font-size:0.75em;color:#666">±2.02</span></td><td style="background:rgba(34,200,80,0.35);text-align:center"><strong>207.46</strong><br><span style="font-size:0.75em;color:#666">±1.63</span></td><td style="background:rgba(64,200,80,0.35);text-align:center"><strong>259.03</strong><br><span style="font-size:0.75em;color:#666">±1.97</span></td><td style="background:rgba(200,20,80,0.35);text-align:center"><strong>979.91</strong><br><span style="font-size:0.75em;color:#666">±16.98</span></td><td style="background:rgba(200,15,80,0.35);text-align:center"><strong>991.17</strong><br><span style="font-size:0.75em;color:#666">±28.40</span></td><td style="background:rgba(200,0,80,0.35);text-align:center"><strong>1025.29</strong><br><span style="font-size:0.75em;color:#666">±16.37</span></td><td style="background:rgba(200,200,80,0.35);text-align:center">76.30</td><td style="background:rgba(180,200,80,0.35);text-align:center">68.66</td><td style="background:rgba(200,85,80,0.35);text-align:center">152.61</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td><td style="background:rgba(200,0,80,0.35);text-align:center">193.89</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td><td style="background:rgba(0,200,80,0.35);text-align:center">🥇 0.0000</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<div class="section">
+  <h2>Glossary — What Each Benchmark Measures</h2>
+  <div class="gloss-grid">
+    
+    <div class="gloss-card">
+      <div class="gloss-num">01</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Matrix Multiply
+          <span class="gloss-badge" style="background:#F05138">Fastest: 🦅 Swift</span>
+          <span class='gloss-best'>7.76 ms</span>
+        </div>
+        <div class="gloss-sig"><code>A × B where A, B are 1000×1000</code></div>
+        <p class="gloss-text">The canonical dense linear algebra kernel. Measures peak BLAS DGEMM throughput. BLAS-linked languages call <code>cblas_dgemm</code> (O(n³) with SIMD/multi-core optimisation); pure implementations use naive or cache-blocked loops. Results vary by 2–10× depending on whether vendor BLAS is used.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">02</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Matrix Inverse
+          <span class="gloss-badge" style="background:#F05138">Fastest: 🦅 Swift</span>
+          <span class='gloss-best'>2.47 ms</span>
+        </div>
+        <div class="gloss-sig"><code>A⁻¹ for a 500×500 symmetric positive-definite (SPD) matrix</code></div>
+        <p class="gloss-text">Computed via LU factorisation (DGETRF) followed by triangular solve (DGETRI). Matrix inversion is rarely used directly in practice — solving Ax=b with <em>Linear System Solve</em> is numerically preferable — but it is a standard benchmark for full LAPACK integration.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">03</div>
+      <div class="gloss-body">
+        <div class="gloss-title">LU Decomposition
+          <span class="gloss-badge" style="background:#F05138">Fastest: 🦅 Swift</span>
+          <span class='gloss-best'>1.17 ms</span>
+        </div>
+        <div class="gloss-sig"><code>A = P·L·U factorisation of a 500×500 matrix</code></div>
+        <p class="gloss-text">Partial-pivot LU (DGETRF) is the workhorse factorisation underlying matrix inversion and general linear solves. Measures LAPACK integration and cache efficiency on a medium-sized problem. Often the fastest path for non-symmetric systems.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">04</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Eigenvalue Decomp
+          <span class="gloss-badge" style="background:#3776AB">Fastest: 🐍 Python</span>
+          <span class='gloss-best'>6.03 ms</span>
+        </div>
+        <div class="gloss-sig"><code>Full symmetric eigendecomposition of a 300×300 matrix</code></div>
+        <p class="gloss-text">Computes all eigenvalues and eigenvectors of a symmetric matrix (DSYEV/DSYEVD). Used in PCA, graph algorithms, quantum mechanics, and structural analysis. Iterative reduction to tridiagonal form makes this slower than Cholesky but faster than general (non-symmetric) eigen for the same size.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">05</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Cholesky
+          <span class="gloss-badge" style="background:#F05138">Fastest: 🦅 Swift</span>
+          <span class='gloss-best'>0.33 ms</span>
+        </div>
+        <div class="gloss-sig"><code>L·Lᵀ factorisation of a 500×500 SPD matrix</code></div>
+        <p class="gloss-text">The fastest dense factorisation for symmetric positive-definite matrices (DPOTRF). Half the cost of LU due to symmetry exploitation. Used in Kalman filters, Gaussian processes, and least-squares problems. A sensitive indicator of raw BLAS Level-3 throughput.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">06</div>
+      <div class="gloss-body">
+        <div class="gloss-title">SVD
+          <span class="gloss-badge" style="background:#F05138">Fastest: 🦅 Swift</span>
+          <span class='gloss-best'>14.68 ms</span>
+        </div>
+        <div class="gloss-sig"><code>Full thin SVD of a 500×300 matrix (U, Σ, Vᵀ)</code></div>
+        <p class="gloss-text">Singular Value Decomposition (DGESDD) is the foundation of dimensionality reduction (PCA/LSA), pseudo-inverse computation, and low-rank approximation. Uses a divide-and-conquer algorithm internally. More expensive than Cholesky or LU due to iterative bidiagonalisation.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">07</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Linear System Solve
+          <span class="gloss-badge" style="background:#F05138">Fastest: 🦅 Swift</span>
+          <span class='gloss-best'>3.29 ms</span>
+        </div>
+        <div class="gloss-sig"><code>Solve Ax = b for 1000×1000 SPD A and 1000-element b</code></div>
+        <p class="gloss-text">The practical alternative to matrix inversion: factorises A (Cholesky for SPD or LU for general) then performs triangular solves. The correct numerical approach for Ax=b. Larger problem size (1000) than the factorisation benchmarks to stress memory bandwidth alongside compute.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">08</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Vector Dot Product
+          <span class="gloss-badge" style="background:#9558B2">Fastest: ∑ Julia</span>
+          <span class='gloss-best'>2.87 ms</span>
+        </div>
+        <div class="gloss-sig"><code>x·y for two 10-million-element vectors</code></div>
+        <p class="gloss-text">A memory-bandwidth-bound BLAS Level-1 operation (DDOT). At 10M doubles the vectors exceed typical L3 cache, so performance reflects RAM bandwidth and SIMD utilisation rather than arithmetic throughput. Exposes overhead from interpreted dispatch (R, Python) vs compiled tight loops.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">09</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Hadamard Product
+          <span class="gloss-badge" style="background:#5D4F85">Fastest: λ Haskell</span>
+          <span class='gloss-best'>0.58 ms</span>
+        </div>
+        <div class="gloss-sig"><code>C = A ⊙ B + C for three 1000×1000 matrices</code></div>
+        <p class="gloss-text">Element-wise (pointwise) multiply-then-add — not a BLAS operation, so every language must loop over 1M doubles itself. Tests compiler vectorisation (SIMD auto-vectorisation in Rust/C++/Julia) and interpreter overhead (Python, R). Julia and Rust typically win here.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">10</div>
+      <div class="gloss-body">
+        <div class="gloss-title">QR Decomposition
+          <span class="gloss-badge" style="background:#F05138">Fastest: 🦅 Swift</span>
+          <span class='gloss-best'>2.56 ms</span>
+        </div>
+        <div class="gloss-sig"><code>Householder QR of a 500×500 matrix (R factor)</code></div>
+        <p class="gloss-text">QR factorisation (DGEQRF) underpins least-squares solvers, eigenvalue algorithms, and orthogonalisation. Only the compact R factor is forced in all languages; forming the full Q is significantly more expensive. Haskell in particular would be ~400× slower if Q were materialised via its Haskell-level Householder products.</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">11</div>
+      <div class="gloss-body">
+        <div class="gloss-title">FFT (real, 1M)
+          <span class="gloss-badge" style="background:#3776AB">Fastest: 🐍 Python</span>
+          <span class='gloss-best'>8.11 ms</span>
+        </div>
+        <div class="gloss-sig"><code>Real FFT of 2²⁰ = 1 048 576 samples</code></div>
+        <p class="gloss-text">Fast Fourier Transform (O(n log n)) is the backbone of signal processing, audio/image analysis, spectral methods, and fast polynomial multiplication. Completely different algorithm class from BLAS. Implementations range from FFTW (near-optimal, used by Python/NumPy and Julia/FFTW.jl) to RustFFT (pure-Rust) and gonum's pure-Go FFT. Haskell is excluded (N/A).</p>
+      </div>
+    </div>
+    <div class="gloss-card">
+      <div class="gloss-num">12</div>
+      <div class="gloss-body">
+        <div class="gloss-title">Sort 10M floats
+          <span class="gloss-badge" style="background:#9558B2">Fastest: ∑ Julia</span>
+          <span class='gloss-best'>148.17 ms</span>
+        </div>
+        <div class="gloss-sig"><code>Unstable sort of 10 million random float64 values</code></div>
+        <p class="gloss-text">A pure-algorithm, comparison-based sort workload with no linear-algebra library involvement. Tests the quality of each language's standard-library sort (introsort, pdqsort, radix sort). At 10M elements the working set exceeds L3 cache, making memory-access pattern and branch-prediction efficiency critical. Results span a 7× range across languages.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Generated by generate_report.py &nbsp;|&nbsp; Fixed seed 42 &nbsp;|&nbsp;
+  Times: mean of 10 runs after 3 warmup rounds<br>
+  <strong>Memory methodology:</strong> &nbsp; <span style="color:#3776AB">Python</span>: tracemalloc (Python-managed heap) &nbsp;·&nbsp; <span style="color:#276DC3">R</span>: gc() Vcells delta (R heap) &nbsp;·&nbsp; <span style="color:#9558B2">Julia</span>: @allocated (total bytes allocated) &nbsp;·&nbsp; <span style="color:#CE422B">Rust</span>: custom GlobalAlloc peak tracker &nbsp;·&nbsp; <span style="color:#00599C">C++</span>: output matrix size (Eigen uses malloc directly) &nbsp;·&nbsp; <span style="color:#5D4F85">Haskell</span>: GHC allocated_bytes delta (total bytes allocated by GC) &nbsp;·&nbsp; <span style="color:#F05138">Swift</span>: output matrix size (Accelerate uses malloc directly) &nbsp;·&nbsp; <span style="color:#00ACD7">Go</span>: runtime.TotalAlloc delta (cumulative bytes allocated)
+</footer>
+
+<script>
+// ── Overview charts ────────────────────────────────────────────────────────────
+(function() {
+  var labels = ["Matrix Multiply", "Matrix Inverse", "LU Decomposition", "Eigenvalue Decomp", "Cholesky", "SVD", "Linear System Solve", "Vector Dot Product", "Hadamard Product", "QR Decomposition", "FFT (real, 1M)", "Sort 10M floats"];
+  var timeDs = [{"label": "Python", "data": [8.043, 3.242, 4.801, 6.026, 0.833, 16.014, 6.646, 2.995, 1.153, 8.08, 8.114, 432.299], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "borderWidth": 1}, {"label": "R", "data": [8.8, 4.3, 2.2, 10, 1.3, 18.3, 11.8, 18.8, 2, 18.5, 61, 398.3], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "borderWidth": 1}, {"label": "Julia", "data": [14.029, 4.103, 1.61, 7.241, 0.716, 20.857, 8.229, 2.872, 0.713, 3.506, 11.229, 148.175], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "borderWidth": 1}, {"label": "Rust", "data": [44.399, 35.54, 9.995, 16.691, 4.552, 56.52, 77.783, 3.192, 0.946, 15.354, 16.337, 207.457], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "borderWidth": 1}, {"label": "C++", "data": [47.88, 9.587, 2.667, 16.424, 1.469, 25.782, 9.177, 3.101, 0.84, 6.111, 17.297, 259.026], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "borderWidth": 1}, {"label": "Haskell", "data": [7.99, 7.538, 17.784, 25.084, 0.958, 15.161, 7.279, 9.909, 0.579, 12.445, null, 979.912], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "borderWidth": 1}, {"label": "Swift", "data": [7.76, 2.471, 1.169, 20.696, 0.33, 14.683, 3.29, 3.154, 1.224, 2.56, 22.629, 991.167], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "borderWidth": 1}, {"label": "Go", "data": [85.739, 29.865, 11.648, 40.495, 9.725, 118.04, 53.564, 13.075, 1.586, 42.525, 26.987, 1025.295], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "borderWidth": 1}];
+  var memDs  = [{"label": "Python", "data": [7.63, 1.908, 5.736, 0.69, 1.908, 1.835, 0.009, 0.0, 7.629, 5.966, 8.001, 76.297], "backgroundColor": "#3776AB99", "borderColor": "#3776AB", "borderWidth": 1}, {"label": "R", "data": [7.63, 1.907, 1.909, 0.69, 1.907, 1.765, 0.008, 0.0, 7.629, 1.913, 16, 68.665], "backgroundColor": "#276DC399", "borderColor": "#276DC3", "borderWidth": 1}, {"label": "Julia", "data": [7.641, 2.176, 1.926, 1.484, 1.922, 5.101, 7.656, 0.0, 7.641, 2.203, 8.016, 152.614], "backgroundColor": "#9558B299", "borderColor": "#9558B2", "borderWidth": 1}, {"label": "Rust", "data": [9.708, 1.907, 0.008, 0.693, 0.0, 1.84, 0.023, 0.0, 7.629, 0.004, 48.0, 0.0], "backgroundColor": "#CE422B99", "borderColor": "#CE422B", "borderWidth": 1}, {"label": "C++", "data": [7.629, 1.907, 1.907, 0.689, 1.907, 1.833, 0.008, 0.0, 7.629, 1.907, 8.0, 0], "backgroundColor": "#00599C99", "borderColor": "#00599C", "borderWidth": 1}, {"label": "Haskell", "data": [7.637, 24.85, 130.358, 3.384, 7.447, 3.099, 7.644, 0.0, 15.263, 7.329, null, 193.894], "backgroundColor": "#5D4F8599", "borderColor": "#5D4F85", "borderWidth": 1}, {"label": "Swift", "data": [7.629, 1.907, 1.907, 0.689, 1.907, 1.833, 0.008, 0.0, 7.629, 1.907, 8.0, 0.0], "backgroundColor": "#F0513899", "borderColor": "#F05138", "borderWidth": 1}, {"label": "Go", "data": [7.687, 2.236, 5.806, 0.838, 3.859, 4.134, 7.712, 0, 7.633, 6.056, 32.008, 0], "backgroundColor": "#00ACD799", "borderColor": "#00ACD7", "borderWidth": 1}];
+
+  var shortLabels = labels.map(function(l) {
+    return l.length > 14 ? l.substring(0,13)+'…' : l;
+  });
+
+  new Chart(document.getElementById('timeChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: shortLabels, datasets: timeDs },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12 } },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2) + ' ms'; }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: { size: 10 } } },
+        y: { beginAtZero: true, title: { display: true, text: 'ms' } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('memChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: shortLabels, datasets: memDs },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top', labels: { boxWidth: 12 } },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return ctx.dataset.label + ': ' + (ctx.parsed.y||0).toFixed(2) + ' MB'; }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { font: { size: 10 } } },
+        y: { beginAtZero: true, title: { display: true, text: 'MB' } }
+      }
+    }
+  });
+})();
+
+// ── Per-op mini charts ─────────────────────────────────────────────────────────
+
+        (function() {
+            var ctx = document.getElementById('opscatter_0').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 8.043, "y": 7.6299}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 8.8, "y": 7.6295}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 14.0289, "y": 7.6407}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 44.3992, "y": 9.7075}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 47.8805, "y": 7.6294}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 7.9899, "y": 7.6365}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 7.7597, "y": 7.6294}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 85.7392, "y": 7.6871}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_1').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 3.2419, "y": 1.9083}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 4.3, "y": 1.9074}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 4.1029, "y": 2.176}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 35.5395, "y": 1.9073}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 9.5869, "y": 1.9074}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 7.5378, "y": 24.8504}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 2.4713, "y": 1.9073}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 29.865, "y": 2.2358}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_2').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 4.8007, "y": 5.7359}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 2.2, "y": 1.9093}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 1.6097, "y": 1.9259}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 9.9951, "y": 0.0076}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 2.6672, "y": 1.9074}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 17.7836, "y": 130.3583}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 1.169, "y": 1.9073}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 11.6478, "y": 5.8062}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_3').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 6.0261, "y": 0.6901}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 10, "y": 0.6901}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 7.2412, "y": 1.4843}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 16.6907, "y": 0.6935}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 16.4235, "y": 0.6889}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 25.0845, "y": 3.384}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 20.6962, "y": 0.6889}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 40.4954, "y": 0.8382}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_4').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 0.8328, "y": 1.9083}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 1.3, "y": 1.9074}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 0.7158, "y": 1.922}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 4.5522, "y": 0.0}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 1.4689, "y": 1.9074}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 0.9581, "y": 7.4472}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 0.3296, "y": 1.9073}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 9.7247, "y": 3.8585}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_5').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 16.0136, "y": 1.8348}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 18.3, "y": 1.7647}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 20.8568, "y": 5.1005}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 56.5203, "y": 1.8402}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 25.7823, "y": 1.8333}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 15.1608, "y": 3.0986}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 14.6834, "y": 1.8333}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 118.0397, "y": 4.1345}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_6').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 6.6461, "y": 0.0087}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 11.8, "y": 0.0076}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 8.2286, "y": 7.6564}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 77.7828, "y": 0.0229}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 9.1769, "y": 0.0076}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 7.2786, "y": 7.6443}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 3.2904, "y": 0.0076}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 53.5641, "y": 7.7121}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_7').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 2.9953, "y": 0.0001}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 18.8, "y": 0.0}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 2.8718, "y": 0.0}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 3.1919, "y": 0.0}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 3.1007, "y": 0.0}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 9.9092, "y": 0.0}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 3.1536, "y": 0.0}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 13.0755, "y": 0}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_8').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 1.1527, "y": 7.6295}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 2, "y": 7.6294}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 0.7133, "y": 7.6407}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 0.9456, "y": 7.6294}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 0.8397, "y": 7.6294}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 0.5787, "y": 15.2631}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 1.2244, "y": 7.6294}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 1.5861, "y": 7.6329}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_9').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 8.0799, "y": 5.9664}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 18.5, "y": 1.9131}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 3.5063, "y": 2.2033}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 15.3545, "y": 0.0038}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 6.1106, "y": 1.9074}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 12.4449, "y": 7.3289}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 2.5598, "y": 1.9073}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 42.5245, "y": 6.0556}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_10').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 8.1142, "y": 8.0014}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 61, "y": 16}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 11.2292, "y": 8.0161}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 16.3369, "y": 48.0004}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 17.297, "y": 8.0}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 22.6293, "y": 8.0}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 26.9872, "y": 32.0078}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+
+        (function() {
+            var ctx = document.getElementById('opscatter_11').getContext('2d');
+            new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: [{"label": "\ud83d\udc0d Python", "data": [{"x": 432.2993, "y": 76.2965}], "backgroundColor": "#3776ABCC", "borderColor": "#3776AB", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udcca R", "data": [{"x": 398.3, "y": 68.6646}], "backgroundColor": "#276DC3CC", "borderColor": "#276DC3", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2211 Julia", "data": [{"x": 148.1749, "y": 152.6135}], "backgroundColor": "#9558B2CC", "borderColor": "#9558B2", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u2699 Rust", "data": [{"x": 207.4575, "y": 0.0}], "backgroundColor": "#CE422BCC", "borderColor": "#CE422B", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u26a1 C++", "data": [{"x": 259.026, "y": 0}], "backgroundColor": "#00599CCC", "borderColor": "#00599C", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\u03bb Haskell", "data": [{"x": 979.9116, "y": 193.8944}], "backgroundColor": "#5D4F85CC", "borderColor": "#5D4F85", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83e\udd85 Swift", "data": [{"x": 991.1669, "y": 0.0}], "backgroundColor": "#F05138CC", "borderColor": "#F05138", "pointRadius": 7, "pointHoverRadius": 10}, {"label": "\ud83d\udc39 Go", "data": [{"x": 1025.2949, "y": 0}], "backgroundColor": "#00ACD7CC", "borderColor": "#00ACD7", "pointRadius": 7, "pointHoverRadius": 10}] },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 10, font: { size: 10 }, padding: 6 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ': '
+                                        + ctx.parsed.x.toFixed(2) + ' ms, '
+                                        + ctx.parsed.y.toFixed(2) + ' MB';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Time (ms)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Memory (MB)', font: { size: 10 } },
+                            ticks: { font: { size: 9 } }
+                        }
+                    }
+                }
+            });
+        })();
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+{
+  "language": "Go",
+  "version": "Go 1.26.1 / gonum 0.15",
+  "platform": "darwin",
+  "operations": [
+    {
+      "name": "Matrix Multiply",
+      "description": "1000x1000 dense matrix multiplication (A * B)",
+      "mean_ms": 85.73916260000001,
+      "std_ms": 3.570052349648703,
+      "min_ms": 81.487667,
+      "memory_mb": 7.6871337890625
+    },
+    {
+      "name": "Matrix Inverse",
+      "description": "Inversion of 500x500 SPD matrix",
+      "mean_ms": 29.8650416,
+      "std_ms": 0.9636333404303945,
+      "min_ms": 28.348042,
+      "memory_mb": 2.2357559204101562
+    },
+    {
+      "name": "LU Decomposition",
+      "description": "LU factorisation of 500x500 matrix",
+      "mean_ms": 11.6478251,
+      "std_ms": 0.25473761195294636,
+      "min_ms": 11.394542000000001,
+      "memory_mb": 5.806192016601562
+    },
+    {
+      "name": "Eigenvalue Decomp",
+      "description": "Full eigendecomposition of 300x300 symmetric matrix",
+      "mean_ms": 40.4954249,
+      "std_ms": 0.18417190547336326,
+      "min_ms": 40.2165,
+      "memory_mb": 0.8382247924804688
+    },
+    {
+      "name": "Cholesky",
+      "description": "Cholesky factorisation of 500x500 SPD matrix",
+      "mean_ms": 9.724675,
+      "std_ms": 0.13213831848180896,
+      "min_ms": 9.613750000000001,
+      "memory_mb": 3.858509826660156
+    },
+    {
+      "name": "SVD",
+      "description": "Full SVD of 500x300 matrix",
+      "mean_ms": 118.0397417,
+      "std_ms": 1.1178516172456014,
+      "min_ms": 116.85320899999999,
+      "memory_mb": 4.134454345703125
+    },
+    {
+      "name": "Linear System Solve",
+      "description": "Solve Ax=b for 1000x1000 A, 1000 b",
+      "mean_ms": 53.5641419,
+      "std_ms": 8.371237161098325,
+      "min_ms": 48.926459,
+      "memory_mb": 7.712080383300782
+    },
+    {
+      "name": "Vector Dot Product",
+      "description": "Dot product of two 10M-element vectors",
+      "mean_ms": 13.075466500000001,
+      "std_ms": 0.2589176916675456,
+      "min_ms": 12.803166,
+      "memory_mb": 0
+    },
+    {
+      "name": "Hadamard Product",
+      "description": "Element-wise multiply + add on 1000x1000 matrices",
+      "mean_ms": 1.586096,
+      "std_ms": 0.09170885684818018,
+      "min_ms": 1.4981250000000002,
+      "memory_mb": 7.63287353515625
+    },
+    {
+      "name": "QR Decomposition",
+      "description": "QR factorisation of 500x500 matrix",
+      "mean_ms": 42.52451659999999,
+      "std_ms": 0.3734561239766193,
+      "min_ms": 41.858833,
+      "memory_mb": 6.055593872070313
+    },
+    {
+      "name": "FFT (real, 1M)",
+      "description": "Real FFT of 2^20=1M-element vector (gonum fourier)",
+      "mean_ms": 26.987170699999997,
+      "std_ms": 6.534458372170122,
+      "min_ms": 24.474834,
+      "memory_mb": 32.0078125
+    },
+    {
+      "name": "Sort 10M floats",
+      "description": "Unstable sort of 10M random float64 values (slices.Sort)",
+      "mean_ms": 1025.2948666000002,
+      "std_ms": 16.36570576770283,
+      "min_ms": 1008.9119580000001,
+      "memory_mb": 0
+    }
+  ]
+}
