@@ -220,6 +220,39 @@
   .gloss-text code { background: #f4f6f9; padding: .1em .35em; border-radius: 3px;
                       font-size: .92em; }
   .gloss-text em { font-style: italic; }
+
+  /* ── Appendix / Changelog ── */
+  .chg-list { list-style: none; display: flex; flex-direction: column; gap: .7rem; margin-bottom: 2rem; }
+  .chg-item {
+    background: #fff;
+    border-radius: 10px;
+    padding: .9rem 1.2rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: .5rem 1rem;
+    font-size: .84rem;
+    align-items: start;
+  }
+  @media(max-width:600px) { .chg-item { grid-template-columns: 1fr; } }
+  .chg-date { font-weight: 700; color: #999; font-size: .75rem; padding-top: .15rem; }
+  .chg-body { line-height: 1.6; }
+  .chg-body strong { color: #16213e; }
+  .chg-body a { color: #0f3460; text-decoration: none; }
+  .chg-body a:hover { text-decoration: underline; }
+  .chg-tag {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 700;
+    padding: .1em .5em;
+    border-radius: 999px;
+    margin-right: .3em;
+    vertical-align: middle;
+    color: #fff;
+  }
+  .chg-fix  { background: #e05252; }
+  .chg-feat { background: #2ecc71; }
+  .chg-data { background: #3498db; }
 </style>
 </head>
 <body>
@@ -678,6 +711,31 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="section">
+  <h2>Appendix — Changelog</h2>
+  <ul class="chg-list">
+    <li class="chg-item">
+      <span class="chg-date">2026-03-26</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Haskell — LU Decomposition benchmark corrected</strong><br>
+        A pull-request from
+        <a href="https://github.com/jonocarroll" target="_blank">@jonocarroll</a>
+        switched the LU harness to <code>luPacked</code> + <code>evaluate</code>.
+        However, GHC's <code>evaluate</code> only forces the outermost constructor
+        to WHNF; the underlying LAPACK <code>dgetrf</code> call remained a thunk,
+        producing spurious 0.00 ms / 0.00 MB results.
+        Fixed by forcing the explicit L and U factor matrices
+        (<code>lu m</code> with <code>forceM l &gt;&gt; forceM u</code>),
+        which drives evaluation all the way through.
+        Corrected timings: <strong>17.29 ms</strong>, <strong>130.36 MB</strong>.
+        Thanks <a href="https://github.com/jonocarroll" target="_blank">@jonocarroll</a>
+        for the contribution!
+      </span>
+    </li>
+  </ul>
 </div>
 
 <footer>
