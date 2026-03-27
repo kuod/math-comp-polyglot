@@ -253,7 +253,7 @@ def generate_html(data: dict) -> str:
     lang_headers_mem = "".join(
         f'<th style="background:{LANG_META.get(l,{}).get("color","#888")}22;'
         f'color:{LANG_META.get(l,{}).get("color","#333")};text-align:center">'
-        f'Memory MB</th>'
+        f'{l}</th>'
         for l in langs
     )
 
