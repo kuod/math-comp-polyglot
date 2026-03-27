@@ -285,6 +285,19 @@ def generate_html(data: dict) -> str:
     # Sort langs by golf score (ascending = better) for the leaderboard
     ranked_langs = sorted(langs, key=lambda l: golf_scores[l])
 
+    # ── Memory golf scores: rank each lang per op by memory_mb ───────────────
+    mem_golf_scores = {lang: 0 for lang in langs}
+    for op in op_names:
+        participating_mem = [
+            (op_table[l][op]["memory_mb"], l)
+            for l in langs if op in op_table.get(l, {})
+        ]
+        participating_mem.sort()      # ascending by memory
+        for rank, (_, l) in enumerate(participating_mem, start=1):
+            mem_golf_scores[l] += rank
+
+    mem_ranked_langs = sorted(langs, key=lambda l: mem_golf_scores[l])
+
     # Assign overall place (1-indexed)
     overall_place = {l: i + 1 for i, l in enumerate(ranked_langs)}
     place_medals = {1: "🥇", 2: "🥈", 3: "🥉"}
@@ -313,7 +326,7 @@ def generate_html(data: dict) -> str:
 
     lang_cards_html = "\n".join(lang_cards)
 
-    # ── Per-op rank matrix ─────────────────────────────────────────────────────
+    # ── Per-op rank matrix (speed) ────────────────────────────────────────────
     op_ranks = {l: {} for l in langs}  # op_ranks[lang][op] = 1-based rank
     for op in op_names:
         ordered = sorted(
@@ -321,6 +334,15 @@ def generate_html(data: dict) -> str:
         )
         for rank, (_, l) in enumerate(ordered, start=1):
             op_ranks[l][op] = rank
+
+    # ── Per-op rank matrix (memory) ───────────────────────────────────────────
+    mem_op_ranks = {l: {} for l in langs}
+    for op in op_names:
+        ordered_mem = sorted(
+            [(op_table[l][op]["memory_mb"], l) for l in langs if op in op_table.get(l, {})],
+        )
+        for rank, (_, l) in enumerate(ordered_mem, start=1):
+            mem_op_ranks[l][op] = rank
 
     def rank_bg(rank, n):
         """Green for low rank (fast), red for high rank (slow)."""
@@ -333,7 +355,7 @@ def generate_html(data: dict) -> str:
             g = int(185 * (1 - (t - 0.5) * 2))
         return f"rgba({r},{g},40,0.35)"
 
-    # ── Leaderboard table ──────────────────────────────────────────────────────
+    # ── Leaderboard tables ────────────────────────────────────────────────────
     op_abbrev = {
         "Matrix Multiply":      "MatMul",
         "Matrix Inverse":       "Inv",
@@ -351,55 +373,67 @@ def generate_html(data: dict) -> str:
     lb_op_headers = "".join(
         f'<th title="{op}">{op_abbrev.get(op, op)}</th>' for op in op_names
     )
-    lb_rows = []
-    for i, lang in enumerate(ranked_langs):
-        meta = LANG_META.get(lang, {"color": "#888", "logo": "?"})
-        place = i + 1
-        medal = place_medals.get(place, f"#{place}")
-        score = golf_scores[lang]
-        cells = []
-        for op in op_names:
-            if op in op_ranks[lang]:
-                r = op_ranks[lang][op]
-                n = sum(1 for l in langs if op in op_ranks[l])
-                gold = " lb-gold" if r == 1 else ""
-                cells.append(
-                    f'<td class="lb-rank{gold}" style="background:{rank_bg(r,n)}">{r}</td>'
-                )
-            else:
-                cells.append('<td style="color:#ccc;text-align:center">—</td>')
-        lb_rows.append(
-            f'<tr>'
-            f'<td class="lb-place">{medal}</td>'
-            f'<td class="lb-lang" style="color:{meta["color"]}">'
-            f'{meta["logo"]} {lang}</td>'
-            f'<td class="lb-score"><strong>{score}</strong></td>'
-            f'{"".join(cells)}'
-            f'</tr>'
+
+    def build_lb_rows(ranked, scores, ranks_dict):
+        rows = []
+        for i, lang in enumerate(ranked):
+            meta = LANG_META.get(lang, {"color": "#888", "logo": "?"})
+            place = i + 1
+            medal = place_medals.get(place, f"#{place}")
+            score = scores[lang]
+            cells = []
+            for op in op_names:
+                if op in ranks_dict[lang]:
+                    r = ranks_dict[lang][op]
+                    n = sum(1 for l in langs if op in ranks_dict[l])
+                    gold = " lb-gold" if r == 1 else ""
+                    cells.append(
+                        f'<td class="lb-rank{gold}" style="background:{rank_bg(r,n)}">{r}</td>'
+                    )
+                else:
+                    cells.append('<td style="color:#ccc;text-align:center">—</td>')
+            rows.append(
+                f'<tr>'
+                f'<td class="lb-place">{medal}</td>'
+                f'<td class="lb-lang" style="color:{meta["color"]}">'
+                f'{meta["logo"]} {lang}</td>'
+                f'<td class="lb-score"><strong>{score}</strong></td>'
+                f'{"".join(cells)}'
+                f'</tr>'
+            )
+        return rows
+
+    speed_rows = build_lb_rows(ranked_langs, golf_scores, op_ranks)
+    mem_rows   = build_lb_rows(mem_ranked_langs, mem_golf_scores, mem_op_ranks)
+
+    def lb_table(rows):
+        return (
+            f'<div class="table-wrap">'
+            f'<table class="lb-table">'
+            f'<thead><tr>'
+            f'<th>Rank</th><th>Language</th><th>Score</th>'
+            f'{lb_op_headers}'
+            f'</tr></thead>'
+            f'<tbody>{"".join(rows)}</tbody>'
+            f'</table></div>'
         )
+
     leaderboard_html = f"""
 <div class="section">
   <h2>Leaderboard — Golf Scoring (1st = 1 pt · lowest score wins)</h2>
-  <p style="font-size:.85rem;color:#666;margin-bottom:1rem">
-    Each cell shows a language's finishing position (1 = fastest) for that operation.
+  <p style="font-size:.85rem;color:#666;margin-bottom:1.5rem">
+    Each cell shows a language's finishing position for that operation.
     Scores are summed across all operations. Languages missing an operation (Haskell/FFT)
     are excluded from that op's ranking and receive no penalty points.
   </p>
-  <div class="table-wrap">
-    <table class="lb-table">
-      <thead>
-        <tr>
-          <th>Rank</th>
-          <th>Language</th>
-          <th>Score</th>
-          {lb_op_headers}
-        </tr>
-      </thead>
-      <tbody>
-        {"".join(lb_rows)}
-      </tbody>
-    </table>
-  </div>
+
+  <h3 style="margin-bottom:.5rem">⚡ Speed Ranking</h3>
+  <p style="font-size:.82rem;color:#666;margin-bottom:.75rem">Ranked by mean execution time (ms) — lower is faster.</p>
+  {lb_table(speed_rows)}
+
+  <h3 style="margin-top:2rem;margin-bottom:.5rem">💾 Memory Ranking</h3>
+  <p style="font-size:.82rem;color:#666;margin-bottom:.75rem">Ranked by peak memory usage (MB) — lower is leaner. Note: memory measurements are not apples-to-apples across languages (see Glossary).</p>
+  {lb_table(mem_rows)}
 </div>"""
 
     # ── Executive summary ──────────────────────────────────────────────────────
@@ -407,6 +441,10 @@ def generate_html(data: dict) -> str:
     runner_up = ranked_langs[1] if len(ranked_langs) > 1 else ""
     third = ranked_langs[2] if len(ranked_langs) > 2 else ""
     winner_meta = LANG_META.get(winner, {"color": "#888"})
+    mem_winner = mem_ranked_langs[0]
+    mem_runner_up = mem_ranked_langs[1] if len(mem_ranked_langs) > 1 else ""
+    mem_third = mem_ranked_langs[2] if len(mem_ranked_langs) > 2 else ""
+    mem_winner_meta = LANG_META.get(mem_winner, {"color": "#888"})
 
     # Languages that link system BLAS/LAPACK (fast on dense ops)
     blas_langs = {"Python", "R", "Julia", "Haskell", "Swift"}
@@ -458,13 +496,24 @@ def generate_html(data: dict) -> str:
   <div class="exec-grid">
 
     <div class="exec-card exec-winner">
-      <div class="exec-label">Overall Winner</div>
+      <div class="exec-label">⚡ Speed Winner</div>
       <div class="exec-hero" style="color:{winner_meta['color']}">
         🥇 {winner}
       </div>
       <div class="exec-sub">Score: {golf_scores[winner]} &nbsp;|&nbsp;
         Runner-up: {runner_up} ({golf_scores.get(runner_up,'')}) &nbsp;|&nbsp;
         3rd: {third} ({golf_scores.get(third,'')})
+      </div>
+    </div>
+
+    <div class="exec-card exec-winner">
+      <div class="exec-label">💾 Memory Winner</div>
+      <div class="exec-hero" style="color:{mem_winner_meta['color']}">
+        🥇 {mem_winner}
+      </div>
+      <div class="exec-sub">Score: {mem_golf_scores[mem_winner]} &nbsp;|&nbsp;
+        Runner-up: {mem_runner_up} ({mem_golf_scores.get(mem_runner_up,'')}) &nbsp;|&nbsp;
+        3rd: {mem_third} ({mem_golf_scores.get(mem_third,'')})
       </div>
     </div>
 
