@@ -135,10 +135,9 @@ operations =
             (forceM . inv)
 
   , benchOp "LU Decomposition"
-            "LU factorisation of 500x500 matrix (luPacked)"
+            "LU factorisation of 500x500 matrix (luPacked, L and U forced)"
             (return (randMatrix 500 500))
-            (\m -> let lup = luPacked m
-                   in  evaluate lup >> return ())
+            (\m -> let (l, u, _, _) = lu m in forceM l >> forceM u)
 
   , benchOp "Eigenvalue Decomp"
             "Full eigendecomposition of 300x300 symmetric matrix"
