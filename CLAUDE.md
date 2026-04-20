@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project does
 
-Benchmarks 12 numerical/linear-algebra operations across Python, R, Julia, Rust, C++, Haskell, Swift, and Go. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `index.html`.
+Benchmarks 12 numerical/linear-algebra operations across Python, R, Julia, Rust, C++, Haskell, Swift, Go, and Numba. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `index.html`.
 
 ## Running benchmarks
 
@@ -14,6 +14,7 @@ Benchmarks 12 numerical/linear-algebra operations across Python, R, Julia, Rust,
 
 # Run a single language manually (must be run from project root)
 python3 python/benchmark.py
+python3 numba_bench/benchmark.py   # requires: pip install numba>=0.55
 Rscript r/benchmark.R
 ~/.juliaup/bin/julia julia/benchmark.jl
 ./rust/target/release/benchmark          # after building
@@ -122,6 +123,7 @@ Key dicts that drive rendering — edit these when adding/changing languages:
 | Haskell  | `GHC.Stats.allocated_bytes` delta |
 | Swift    | Theoretical output-matrix size (same rationale as C++) |
 | Go       | `runtime.TotalAlloc` delta (cumulative bytes allocated) |
+| Numba    | `tracemalloc` peak (Python-managed heap; output arrays via NumPy) |
 
 ### Performance context
 

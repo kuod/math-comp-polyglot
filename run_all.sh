@@ -18,6 +18,15 @@ else
     skip "python3 not found"
 fi
 
+# ── Numba ─────────────────────────────────────────────────────────────────────
+if command -v python3 &>/dev/null && python3 -c "import numba" &>/dev/null 2>&1; then
+    log "Running Numba benchmark..."
+    cd "$ROOT"
+    python3 numba_bench/benchmark.py
+else
+    skip "numba not importable (pip install numba)"
+fi
+
 # ── R ─────────────────────────────────────────────────────────────────────────
 if command -v Rscript &>/dev/null; then
     log "Running R benchmark..."
