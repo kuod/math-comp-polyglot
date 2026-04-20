@@ -90,9 +90,8 @@ def nb_qr(A):
     return np.linalg.qr(A)
 
 
-@njit(cache=True)
 def nb_fft(x):
-    """Real FFT; np.fft.rfft is supported in @njit since Numba 0.55."""
+    """Real FFT via NumPy (np.fft.rfft not supported in nopython mode on this Numba version)."""
     return np.fft.rfft(x)
 
 
