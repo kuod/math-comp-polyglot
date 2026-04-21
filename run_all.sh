@@ -70,7 +70,7 @@ done
 if [ -n "$CARGO_BIN" ]; then
     log "Building Rust benchmark (release)..."
     cd "$ROOT/rust"
-    "$CARGO_BIN" build --release -q
+    RUSTFLAGS="-C target-cpu=native" "$CARGO_BIN" build --release -q
     log "Running Rust benchmark..."
     cd "$ROOT"
     ./rust/target/release/benchmark

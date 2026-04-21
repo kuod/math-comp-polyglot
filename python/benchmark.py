@@ -9,26 +9,7 @@ import platform
 import sys
 import os
 
-try:
-    from scipy.linalg import lu as scipy_lu
-except ImportError:
-    # Fallback: manual LU via numpy (LU = P^T L U from QR-related decomp)
-    def scipy_lu(A):
-        # Simple PLU via numpy householder (not ideal but works)
-        n = A.shape[0]
-        P = np.eye(n)
-        L = np.eye(n)
-        U = A.copy()
-        for k in range(n - 1):
-            pivot = np.argmax(np.abs(U[k:, k])) + k
-            U[[k, pivot]] = U[[pivot, k]]
-            P[[k, pivot]] = P[[pivot, k]]
-            L[[k, pivot], :k] = L[[pivot, k], :k]
-            if U[k, k] != 0:
-                for i in range(k + 1, n):
-                    L[i, k] = U[i, k] / U[k, k]
-                    U[i] -= L[i, k] * U[k]
-        return P, L, U
+from scipy.linalg import lu as scipy_lu
 
 SEED = 42
 N_WARMUP = 3

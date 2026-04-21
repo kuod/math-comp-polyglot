@@ -6,98 +6,98 @@
     {
       "name": "Matrix Multiply",
       "description": "1000\u00d71000 dense matrix multiplication (@njit \u2192 BLAS dgemm)",
-      "mean_ms": 8.128250299341744,
-      "std_ms": 0.36439767408335194,
-      "min_ms": 7.695375003095251,
+      "mean_ms": 8.528641801967751,
+      "std_ms": 0.31699670169861893,
+      "min_ms": 8.165292005287483,
       "memory_mb": 7.629660415649414
     },
     {
       "name": "Matrix Inverse",
       "description": "Inversion of 500\u00d7500 SPD matrix (@njit \u2192 np.linalg.inv)",
-      "mean_ms": 2.9555918015830684,
-      "std_ms": 0.26032054713669195,
-      "min_ms": 2.730125001107808,
+      "mean_ms": 3.267987599247135,
+      "std_ms": 0.2467004218908321,
+      "min_ms": 2.960208003059961,
       "memory_mb": 2.153656005859375
     },
     {
       "name": "LU Decomposition",
       "description": "LU factorisation of 500\u00d7500 matrix (pure Numba PLU; scipy unavailable in @njit)",
-      "mean_ms": 26.935904101264896,
-      "std_ms": 0.1405423466285737,
-      "min_ms": 26.621083001373336,
-      "memory_mb": 5.722756576538086
+      "mean_ms": 27.988529202411883,
+      "std_ms": 0.3058305089327868,
+      "min_ms": 27.65995799563825,
+      "memory_mb": 5.722738265991211
     },
     {
       "name": "Eigenvalue Decomp",
       "description": "Full eigendecomposition of 300\u00d7300 symmetric matrix (@njit \u2192 np.linalg.eigh)",
-      "mean_ms": 6.009379001625348,
-      "std_ms": 0.13974837073444493,
-      "min_ms": 5.804750006063841,
+      "mean_ms": 6.5456376018119045,
+      "std_ms": 0.3573224540045256,
+      "min_ms": 6.090167007641867,
       "memory_mb": 2.0876922607421875
     },
     {
       "name": "Cholesky",
       "description": "Cholesky factorisation of 500\u00d7500 SPD matrix (@njit \u2192 np.linalg.cholesky)",
-      "mean_ms": 0.7147167998482473,
-      "std_ms": 0.09839435663763113,
-      "min_ms": 0.6482499957201071,
+      "mean_ms": 0.7714501014561392,
+      "std_ms": 0.04841525580866086,
+      "min_ms": 0.7054580055410042,
       "memory_mb": 1.9075984954833984
     },
     {
       "name": "SVD",
       "description": "Full SVD of 500\u00d7300 matrix (@njit \u2192 np.linalg.svd)",
-      "mean_ms": 14.498249900498195,
-      "std_ms": 0.26047370882222537,
-      "min_ms": 14.165624997986015,
-      "memory_mb": 5.063357543945313
+      "mean_ms": 15.961462500854395,
+      "std_ms": 0.2681459570134687,
+      "min_ms": 15.590708993840963,
+      "memory_mb": 5.0633392333984375
     },
     {
       "name": "Linear System Solve",
       "description": "Solve Ax=b for 1000\u00d71000 A, 1000 b (@njit \u2192 np.linalg.solve)",
-      "mean_ms": 6.573687499621883,
-      "std_ms": 0.2573660425505348,
-      "min_ms": 6.228790996829048,
+      "mean_ms": 6.97849150019465,
+      "std_ms": 0.20991497317892552,
+      "min_ms": 6.638791004661471,
       "memory_mb": 7.6412506103515625
     },
     {
       "name": "Vector Dot Product",
       "description": "Dot product of two 10M-element vectors (@njit \u2192 BLAS ddot)",
-      "mean_ms": 2.9952581993711647,
-      "std_ms": 0.2715181328147016,
-      "min_ms": 2.775207998638507,
-      "memory_mb": 0.00010986328125
+      "mean_ms": 3.0498082996928133,
+      "std_ms": 0.26804189791966804,
+      "min_ms": 2.758708011242561,
+      "memory_mb": 9.1552734375e-05
     },
     {
       "name": "Hadamard Product",
       "description": "Element-wise multiply + add on 1000\u00d71000 matrices (@njit parallel prange)",
-      "mean_ms": 0.8770124004513491,
-      "std_ms": 0.08774058251949943,
-      "min_ms": 0.7538330028182827,
+      "mean_ms": 0.8925961010390893,
+      "std_ms": 0.0536312085953789,
+      "min_ms": 0.831583995022811,
       "memory_mb": 7.629644393920898
     },
     {
       "name": "QR Decomposition",
       "description": "QR factorisation of 500\u00d7500 matrix (@njit \u2192 np.linalg.qr)",
-      "mean_ms": 5.9357001999160275,
-      "std_ms": 0.5465700686774373,
-      "min_ms": 5.473709003126714,
-      "memory_mb": 3.940966796875
+      "mean_ms": 8.143266600382049,
+      "std_ms": 4.135690455039271,
+      "min_ms": 5.957542001851834,
+      "memory_mb": 3.940948486328125
     },
     {
       "name": "FFT (real, 1M)",
       "description": "Real FFT of 2\u00b2\u2070=1M-element vector (@njit \u2192 np.fft.rfft; requires Numba \u22650.55)",
-      "mean_ms": 7.377983299375046,
-      "std_ms": 0.23125978210457498,
-      "min_ms": 7.179457999882288,
+      "mean_ms": 7.820741698378697,
+      "std_ms": 0.28413287594224285,
+      "min_ms": 7.469083997420967,
       "memory_mb": 8.001411437988281
     },
     {
       "name": "Sort 10M floats",
       "description": "Unstable sort of 10M random float64 values (@njit \u2192 np.sort)",
-      "mean_ms": 970.8719709000434,
-      "std_ms": 7.98544776885673,
-      "min_ms": 967.0179579989053,
-      "memory_mb": 76.29579467773438
+      "mean_ms": 991.6882417950546,
+      "std_ms": 2.869602199403089,
+      "min_ms": 988.1398750003427,
+      "memory_mb": 76.2957763671875
     }
   ]
 }

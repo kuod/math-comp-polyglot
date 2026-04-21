@@ -105,7 +105,7 @@ OPERATIONS <- list(
     name        = "Vector Dot Product",
     description = "Dot product of two 10M-element vectors",
     setup       = function() list(rnorm(1e7), rnorm(1e7)),
-    op          = function(d) sum(d[[1]] * d[[2]])
+    op          = function(d) as.numeric(crossprod(d[[1]], d[[2]]))
   ),
   list(
     name        = "Hadamard Product",
