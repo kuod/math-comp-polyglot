@@ -259,6 +259,8 @@
   .chg-fix  { background: #e05252; }
   .chg-feat { background: #2ecc71; }
   .chg-data { background: #3498db; }
+  .chg-perf { background: #e67e22; }
+  .chg-note { background: #7f8c8d; }
 </style>
 </head>
 <body>
@@ -737,6 +739,75 @@
 <div class="section">
   <h2>Appendix — Changelog</h2>
   <ul class="chg-list">
+    <li class="chg-item">
+      <span class="chg-date">2026-04-20</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-feat">feat</span>
+        <strong>Numba added as a 9th language</strong><br>
+        JIT-compiled Python via <code>@njit(cache=True)</code> wrapping NumPy/LAPACK.
+        All linear-algebra operations call the same BLAS/LAPACK back-ends as regular Python;
+        the Hadamard product additionally uses <code>@njit(parallel=True)</code> with
+        <code>prange</code> for multi-threaded element-wise execution.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-20</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Numba — FFT decorator removed</strong><br>
+        <code>np.fft.rfft</code> is not supported in <code>@njit</code> nopython mode on
+        Numba 0.64.0 despite an earlier comment claiming support since 0.55.
+        The <code>@njit</code> decorator was removed from the FFT wrapper so it falls back
+        to regular NumPy — preventing a hard crash at runtime. The FFT result is therefore
+        not JIT-compiled and is effectively identical to the Python baseline.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-20</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Python — LU fallback removed; scipy now required</strong><br>
+        A silent fallback to a hand-written O(n³) Gaussian elimination loop was triggered
+        whenever <code>scipy</code> was absent, producing results 10–100× slower than LAPACK
+        with no warning. The fallback is removed; <code>scipy.linalg.lu</code> is now
+        imported unconditionally and the benchmark fails loudly if scipy is missing.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-20</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>R — dot product now calls BLAS <code>ddot</code> via <code>crossprod()</code></strong><br>
+        The previous <code>sum(d[[1]] * d[[2]])</code> allocated a full 10 M-element
+        intermediate vector before summing. Replaced with
+        <code>as.numeric(crossprod(d[[1]], d[[2]]))</code>, which dispatches directly to
+        BLAS <code>ddot</code> with no intermediate allocation.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-20</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-perf">perf</span>
+        <strong>Rust — native-CPU code generation enabled</strong><br>
+        The release build now sets <code>RUSTFLAGS="-C target-cpu=native"</code>, allowing
+        LLVM to emit AVX2 / NEON instructions inside nalgebra's matrix kernels.
+        Previously the build used generic SIMD paths, leaving architecture-specific
+        vector units unused.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-20</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-note">note</span>
+        <strong>Swift — using deprecated pre-ILP64 CBLAS / CLAPACK interface</strong><br>
+        Apple deprecated the classic <code>cblas_dgemm</code> / <code>dgetrf_</code> /
+        <code>dgesdd_</code> / <code>dpotrf_</code> symbols in macOS 13.3 in favour of a
+        new ILP64-capable API accessed via <code>-DACCELERATE_NEW_LAPACK</code>.
+        The benchmark compiles and produces correct results under the old interface
+        (warnings are harmless), but emits deprecation warnings at build time.
+        Migration to the new Accelerate headers is left for a future update.
+      </span>
+    </li>
     <li class="chg-item">
       <span class="chg-date">2026-03-26</span>
       <span class="chg-body">
