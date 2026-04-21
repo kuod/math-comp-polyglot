@@ -601,6 +601,124 @@
 
 <div class="section">
   <h2>Glossary — What Each Benchmark Measures</h2>
+
+  <p style="font-size:.83rem;color:#666;margin-bottom:.75rem">
+    Operations ranked by <strong>cross-language spread</strong> — the ratio of the slowest to fastest time across all languages.
+    A high spread means the choice of language (or its underlying library) matters a lot for that operation.
+  </p>
+  <div style="overflow-x:auto;margin-bottom:2rem">
+  <table style="width:100%;border-collapse:collapse;font-size:.82rem">
+    <thead>
+      <tr style="border-bottom:2px solid #ddd;text-align:left">
+        <th style="padding:.4em .7em;white-space:nowrap">Rank</th>
+        <th style="padding:.4em .7em">Operation</th>
+        <th style="padding:.4em .7em;white-space:nowrap">Spread</th>
+        <th style="padding:.4em .7em;white-space:nowrap">Fastest</th>
+        <th style="padding:.4em .7em;white-space:nowrap">Slowest</th>
+        <th style="padding:.4em .7em">Key driver</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #eee;background:#fff8f0">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">1</td>
+        <td style="padding:.4em .7em;font-weight:600">Cholesky</td>
+        <td style="padding:.4em .7em;font-weight:700;color:#e05252">30.3×</td>
+        <td style="padding:.4em .7em;color:#F05138;white-space:nowrap">Swift — 0.38 ms</td>
+        <td style="padding:.4em .7em;color:#00ACD7;white-space:nowrap">Go — 11.6 ms</td>
+        <td style="padding:.4em .7em;color:#555">BLAS DPOTRF (Accelerate) vs pure-Go gonum — the starkest BLAS vs no-BLAS gap in this suite</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">2</td>
+        <td style="padding:.4em .7em;font-weight:600">Linear System Solve</td>
+        <td style="padding:.4em .7em;font-weight:700;color:#e05252">24.6×</td>
+        <td style="padding:.4em .7em;color:#F05138;white-space:nowrap">Swift — 3.3 ms</td>
+        <td style="padding:.4em .7em;color:#CE422B;white-space:nowrap">Rust — 81.4 ms</td>
+        <td style="padding:.4em .7em;color:#555">nalgebra solves without BLAS; Swift uses DPOTRF + DPOTRS on the 1000×1000 SPD system</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;background:#fff8f0">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">3</td>
+        <td style="padding:.4em .7em;font-weight:600">LU Decomposition</td>
+        <td style="padding:.4em .7em;font-weight:700;color:#e05252">20.5×</td>
+        <td style="padding:.4em .7em;color:#F05138;white-space:nowrap">Swift — 1.4 ms</td>
+        <td style="padding:.4em .7em;color:#27AE60;white-space:nowrap">Numba — 28.0 ms</td>
+        <td style="padding:.4em .7em;color:#555">Numba's <code>@njit</code> cannot call scipy, so LU is a hand-written PLU loop rather than DGETRF</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">4</td>
+        <td style="padding:.4em .7em;font-weight:600">QR Decomposition</td>
+        <td style="padding:.4em .7em;font-weight:700;color:#c0392b">19.3×</td>
+        <td style="padding:.4em .7em;color:#F05138;white-space:nowrap">Swift — 2.6 ms</td>
+        <td style="padding:.4em .7em;color:#00ACD7;white-space:nowrap">Go — 51.1 ms</td>
+        <td style="padding:.4em .7em;color:#555">Swift calls DGEQRF directly; gonum reimplements Householder QR in pure Go</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;background:#fff8f0">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">5</td>
+        <td style="padding:.4em .7em;font-weight:600">Matrix Multiply</td>
+        <td style="padding:.4em .7em;font-weight:700;color:#c0392b">13.9×</td>
+        <td style="padding:.4em .7em;color:#F05138;white-space:nowrap">Swift — 8.2 ms</td>
+        <td style="padding:.4em .7em;color:#00ACD7;white-space:nowrap">Go — 114 ms</td>
+        <td style="padding:.4em .7em;color:#555">BLAS DGEMM (SIMD/multi-core) vs pure-Go nested loops — the classic library benchmark</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">6</td>
+        <td style="padding:.4em .7em;font-weight:600">Matrix Inverse</td>
+        <td style="padding:.4em .7em;font-weight:700">11.5×</td>
+        <td style="padding:.4em .7em;color:#27AE60;white-space:nowrap">Numba — 3.3 ms</td>
+        <td style="padding:.4em .7em;color:#CE422B;white-space:nowrap">Rust — 37.7 ms</td>
+        <td style="padding:.4em .7em;color:#555">nalgebra's pure-Rust matrix inversion vs LAPACK DGETRF+DGETRI in all other languages</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;background:#fff8f0">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">7</td>
+        <td style="padding:.4em .7em;font-weight:600">SVD</td>
+        <td style="padding:.4em .7em;font-weight:700">9.1×</td>
+        <td style="padding:.4em .7em;color:#F05138;white-space:nowrap">Swift — 14.9 ms</td>
+        <td style="padding:.4em .7em;color:#00ACD7;white-space:nowrap">Go — 136 ms</td>
+        <td style="padding:.4em .7em;color:#555">LAPACK DGESDD (divide-and-conquer) vs gonum's pure-Go bidiagonalisation</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">8</td>
+        <td style="padding:.4em .7em;font-weight:600">FFT (real, 1M)</td>
+        <td style="padding:.4em .7em;font-weight:700">8.0×</td>
+        <td style="padding:.4em .7em;color:#27AE60;white-space:nowrap">Numba — 7.8 ms</td>
+        <td style="padding:.4em .7em;color:#276DC3;white-space:nowrap">R — 62.2 ms</td>
+        <td style="padding:.4em .7em;color:#555">NumPy/FFTW vs R's base <code>fft()</code> (not optimised for real input); Haskell excluded</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;background:#fff8f0">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">9</td>
+        <td style="padding:.4em .7em;font-weight:600">Sort 10M floats</td>
+        <td style="padding:.4em .7em;font-weight:700">7.2×</td>
+        <td style="padding:.4em .7em;color:#9558B2;white-space:nowrap">Julia — 149 ms</td>
+        <td style="padding:.4em .7em;color:#00ACD7;white-space:nowrap">Go — 1072 ms</td>
+        <td style="padding:.4em .7em;color:#555">Julia's pdqsort and R's radix sort dominate; Go's sort is comparison-based with no SIMD</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">10</td>
+        <td style="padding:.4em .7em;font-weight:600">Eigenvalue Decomp</td>
+        <td style="padding:.4em .7em;font-weight:700">7.1×</td>
+        <td style="padding:.4em .7em;color:#3776AB;white-space:nowrap">Python — 6.3 ms</td>
+        <td style="padding:.4em .7em;color:#00ACD7;white-space:nowrap">Go — 44.9 ms</td>
+        <td style="padding:.4em .7em;color:#555">LAPACK DSYEV converges quickly for this size; spread is narrowed by iterative algorithm overhead shared across langs</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee;background:#fff8f0">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">11</td>
+        <td style="padding:.4em .7em;font-weight:600">Vector Dot Product</td>
+        <td style="padding:.4em .7em;font-weight:700">5.3×</td>
+        <td style="padding:.4em .7em;color:#3776AB;white-space:nowrap">Python — 2.9 ms</td>
+        <td style="padding:.4em .7em;color:#276DC3;white-space:nowrap">R — 15.1 ms</td>
+        <td style="padding:.4em .7em;color:#555">Memory-bandwidth bound at 10M elements; BLAS DDOT, NumPy, and compiled loops all saturate RAM similarly</td>
+      </tr>
+      <tr style="border-bottom:1px solid #eee">
+        <td style="padding:.4em .7em;font-weight:700;color:#e67e22;text-align:center">12</td>
+        <td style="padding:.4em .7em;font-weight:600">Hadamard Product</td>
+        <td style="padding:.4em .7em;font-weight:700;color:#2ecc71">2.9×</td>
+        <td style="padding:.4em .7em;color:#5D4F85;white-space:nowrap">Haskell — 0.61 ms</td>
+        <td style="padding:.4em .7em;color:#00ACD7;white-space:nowrap">Go — 1.8 ms</td>
+        <td style="padding:.4em .7em;color:#555">No BLAS path; all languages loop over 1M doubles — the tightest cross-language result in the suite</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
   <div class="gloss-grid">
     
     <div class="gloss-card">
