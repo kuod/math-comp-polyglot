@@ -223,6 +223,8 @@
   }
   .gloss-sig code { background: #f4f6f9; padding: .1em .4em; border-radius: 4px; }
   .gloss-text { font-size: .84rem; color: #444; line-height: 1.6; }
+  .gloss-spread { font-size: .73rem; color: #777; margin: .25rem 0 .5rem; }
+  .gloss-rank { display: inline-block; background: #e9eef4; border-radius: 3px; padding: .05em .4em; font-weight: 700; color: #444; font-size: .72rem; margin-right: .3em; }
   .gloss-text code { background: #f4f6f9; padding: .1em .35em; border-radius: 3px;
                       font-size: .92em; }
   .gloss-text em { font-style: italic; }
@@ -609,6 +611,7 @@
           <span class='gloss-best'>8.22 ms</span>
         </div>
         <div class="gloss-sig"><code>A × B where A, B are 1000×1000</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">5 / 12</span> by cross-language spread · 13.9× fastest→slowest (Swift 8.2 ms → Go 114 ms)</div>
         <p class="gloss-text">The canonical dense linear algebra kernel. Measures peak BLAS DGEMM throughput. BLAS-linked languages call <code>cblas_dgemm</code> (O(n³) with SIMD/multi-core optimisation); pure implementations use naive or cache-blocked loops. Results vary by 2–10× depending on whether vendor BLAS is used.</p>
       </div>
     </div>
@@ -620,6 +623,7 @@
           <span class='gloss-best'>3.27 ms</span>
         </div>
         <div class="gloss-sig"><code>A⁻¹ for a 500×500 symmetric positive-definite (SPD) matrix</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">6 / 12</span> by cross-language spread · 11.5× fastest→slowest (Numba 3.3 ms → Rust 37.7 ms)</div>
         <p class="gloss-text">Computed via LU factorisation (DGETRF) followed by triangular solve (DGETRI). Matrix inversion is rarely used directly in practice — solving Ax=b with <em>Linear System Solve</em> is numerically preferable — but it is a standard benchmark for full LAPACK integration.</p>
       </div>
     </div>
@@ -631,6 +635,7 @@
           <span class='gloss-best'>1.37 ms</span>
         </div>
         <div class="gloss-sig"><code>A = P·L·U factorisation of a 500×500 matrix</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">3 / 12</span> by cross-language spread · 20.5× fastest→slowest (Swift 1.4 ms → Numba 28.0 ms)</div>
         <p class="gloss-text">Partial-pivot LU (DGETRF) is the workhorse factorisation underlying matrix inversion and general linear solves. Measures LAPACK integration and cache efficiency on a medium-sized problem. Often the fastest path for non-symmetric systems.</p>
       </div>
     </div>
@@ -642,6 +647,7 @@
           <span class='gloss-best'>6.31 ms</span>
         </div>
         <div class="gloss-sig"><code>Full symmetric eigendecomposition of a 300×300 matrix</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">10 / 12</span> by cross-language spread · 7.1× fastest→slowest (Python 6.3 ms → Go 44.9 ms)</div>
         <p class="gloss-text">Computes all eigenvalues and eigenvectors of a symmetric matrix (DSYEV/DSYEVD). Used in PCA, graph algorithms, quantum mechanics, and structural analysis. Iterative reduction to tridiagonal form makes this slower than Cholesky but faster than general (non-symmetric) eigen for the same size.</p>
       </div>
     </div>
@@ -653,6 +659,7 @@
           <span class='gloss-best'>0.38 ms</span>
         </div>
         <div class="gloss-sig"><code>L·Lᵀ factorisation of a 500×500 SPD matrix</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">1 / 12</span> by cross-language spread · 30.3× fastest→slowest (Swift 0.38 ms → Go 11.6 ms)</div>
         <p class="gloss-text">The fastest dense factorisation for symmetric positive-definite matrices (DPOTRF). Half the cost of LU due to symmetry exploitation. Used in Kalman filters, Gaussian processes, and least-squares problems. A sensitive indicator of raw BLAS Level-3 throughput.</p>
       </div>
     </div>
@@ -664,6 +671,7 @@
           <span class='gloss-best'>14.94 ms</span>
         </div>
         <div class="gloss-sig"><code>Full thin SVD of a 500×300 matrix (U, Σ, Vᵀ)</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">7 / 12</span> by cross-language spread · 9.1× fastest→slowest (Swift 14.9 ms → Go 136 ms)</div>
         <p class="gloss-text">Singular Value Decomposition (DGESDD) is the foundation of dimensionality reduction (PCA/LSA), pseudo-inverse computation, and low-rank approximation. Uses a divide-and-conquer algorithm internally. More expensive than Cholesky or LU due to iterative bidiagonalisation.</p>
       </div>
     </div>
@@ -675,6 +683,7 @@
           <span class='gloss-best'>3.30 ms</span>
         </div>
         <div class="gloss-sig"><code>Solve Ax = b for 1000×1000 SPD A and 1000-element b</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">2 / 12</span> by cross-language spread · 24.6× fastest→slowest (Swift 3.3 ms → Rust 81.4 ms)</div>
         <p class="gloss-text">The practical alternative to matrix inversion: factorises A (Cholesky for SPD or LU for general) then performs triangular solves. The correct numerical approach for Ax=b. Larger problem size (1000) than the factorisation benchmarks to stress memory bandwidth alongside compute.</p>
       </div>
     </div>
@@ -686,6 +695,7 @@
           <span class='gloss-best'>2.85 ms</span>
         </div>
         <div class="gloss-sig"><code>x·y for two 10-million-element vectors</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">11 / 12</span> by cross-language spread · 5.3× fastest→slowest (Python 2.9 ms → R 15.1 ms)</div>
         <p class="gloss-text">A memory-bandwidth-bound BLAS Level-1 operation (DDOT). At 10M doubles the vectors exceed typical L3 cache, so performance reflects RAM bandwidth and SIMD utilisation rather than arithmetic throughput. Exposes overhead from interpreted dispatch (R, Python) vs compiled tight loops.</p>
       </div>
     </div>
@@ -697,6 +707,7 @@
           <span class='gloss-best'>0.61 ms</span>
         </div>
         <div class="gloss-sig"><code>C = A ⊙ B + C for three 1000×1000 matrices</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">12 / 12</span> by cross-language spread · 2.9× fastest→slowest (Haskell 0.61 ms → Go 1.8 ms)</div>
         <p class="gloss-text">Element-wise (pointwise) multiply-then-add — not a BLAS operation, so every language must loop over 1M doubles itself. Tests compiler vectorisation (SIMD auto-vectorisation in Rust/C++/Julia) and interpreter overhead (Python, R). Julia and Rust typically win here.</p>
       </div>
     </div>
@@ -708,6 +719,7 @@
           <span class='gloss-best'>2.65 ms</span>
         </div>
         <div class="gloss-sig"><code>Householder QR of a 500×500 matrix (R factor)</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">4 / 12</span> by cross-language spread · 19.3× fastest→slowest (Swift 2.6 ms → Go 51.1 ms)</div>
         <p class="gloss-text">QR factorisation (DGEQRF) underpins least-squares solvers, eigenvalue algorithms, and orthogonalisation. Only the compact R factor is forced in all languages; forming the full Q is significantly more expensive. Haskell in particular would be ~400× slower if Q were materialised via its Haskell-level Householder products.</p>
       </div>
     </div>
@@ -719,6 +731,7 @@
           <span class='gloss-best'>7.82 ms</span>
         </div>
         <div class="gloss-sig"><code>Real FFT of 2²⁰ = 1 048 576 samples</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">8 / 12</span> by cross-language spread · 8.0× fastest→slowest (Numba 7.8 ms → R 62.2 ms · Haskell excluded)</div>
         <p class="gloss-text">Fast Fourier Transform (O(n log n)) is the backbone of signal processing, audio/image analysis, spectral methods, and fast polynomial multiplication. Completely different algorithm class from BLAS. Implementations range from FFTW (near-optimal, used by Python/NumPy and Julia/FFTW.jl) to RustFFT (pure-Rust) and gonum's pure-Go FFT. Haskell is excluded (N/A).</p>
       </div>
     </div>
@@ -730,6 +743,7 @@
           <span class='gloss-best'>149.31 ms</span>
         </div>
         <div class="gloss-sig"><code>Unstable sort of 10 million random float64 values</code></div>
+        <div class="gloss-spread"><span class="gloss-rank">9 / 12</span> by cross-language spread · 7.2× fastest→slowest (Julia 149 ms → Go 1072 ms)</div>
         <p class="gloss-text">A pure-algorithm, comparison-based sort workload with no linear-algebra library involvement. Tests the quality of each language's standard-library sort (introsort, pdqsort, radix sort). At 10M elements the working set exceeds L3 cache, making memory-access pattern and branch-prediction efficiency critical. Results span a 7× range across languages.</p>
       </div>
     </div>
