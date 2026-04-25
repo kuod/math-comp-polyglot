@@ -151,15 +151,15 @@ def main():
         print(f"{r['mean_ms']:.2f} ms  ({r['memory_mb']:.2f} MB)")
 
     out = {
-        "language": "Python",
+        "language": "Python (NumPy)",
         "version": f"Python {sys.version.split()[0]} / NumPy {np.__version__}",
         "platform": platform.platform(),
         "operations": results,
     }
     os.makedirs("results", exist_ok=True)
-    with open("results/python_results.json", "w") as f:
+    with open("results/python_numpy_results.json", "w") as f:
         json.dump(out, f, indent=2)
-    print("Saved results/python_results.json")
+    print("Saved results/python_numpy_results.json")
 
 
 if __name__ == "__main__":

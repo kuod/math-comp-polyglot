@@ -9,13 +9,31 @@ mkdir -p "$RESULTS"
 log()  { echo "[run_all] $*"; }
 skip() { echo "[run_all] SKIP – $*"; }
 
-# ── Python ────────────────────────────────────────────────────────────────────
+# ── Python (NumPy) ────────────────────────────────────────────────────────────
 if command -v python3 &>/dev/null; then
-    log "Running Python benchmark..."
+    log "Running Python (NumPy) benchmark..."
     cd "$ROOT"
     python3 python/benchmark.py
 else
     skip "python3 not found"
+fi
+
+# ── Python (Pandas) ───────────────────────────────────────────────────────────
+if command -v python3 &>/dev/null && python3 -c "import pandas" &>/dev/null 2>&1; then
+    log "Running Python (Pandas) benchmark..."
+    cd "$ROOT"
+    python3 python_pandas/benchmark.py
+else
+    skip "pandas not importable (pip install pandas)"
+fi
+
+# ── Python (Polars) ───────────────────────────────────────────────────────────
+if command -v python3 &>/dev/null && python3 -c "import polars" &>/dev/null 2>&1; then
+    log "Running Python (Polars) benchmark..."
+    cd "$ROOT"
+    python3 python_polars/benchmark.py
+else
+    skip "polars not importable (pip install polars)"
 fi
 
 # ── Numba ─────────────────────────────────────────────────────────────────────
@@ -152,6 +170,15 @@ if [ -n "$GO_BIN" ]; then
     ./go/go-bench
 else
     skip "go not found"
+fi
+
+# ── Octave ───────────────────────────────────────────────────────────────────
+if command -v octave &>/dev/null; then
+    log "Running Octave benchmark..."
+    cd "$ROOT"
+    octave --no-gui octave/benchmark.m
+else
+    skip "octave not found (brew install octave)"
 fi
 
 # ── Generate HTML report ──────────────────────────────────────────────────────

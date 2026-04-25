@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project does
 
-Benchmarks 12 numerical/linear-algebra operations across Python, R, Julia, Rust, C++, Haskell, Swift, Go, and Numba. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `index.html`.
+Benchmarks 12 numerical/linear-algebra operations across Python (NumPy), Python (Pandas), Python (Polars), Octave, R, Julia, Rust, C++, Haskell, Swift, Go, and Numba. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `index.html`.
 
 ## Running benchmarks
 
@@ -13,8 +13,11 @@ Benchmarks 12 numerical/linear-algebra operations across Python, R, Julia, Rust,
 ./run_all.sh
 
 # Run a single language manually (must be run from project root)
-python3 python/benchmark.py
-python3 numba_bench/benchmark.py   # requires: pip install numba>=0.55
+python3 python/benchmark.py               # Python (NumPy)
+python3 python_pandas/benchmark.py        # requires: pip install pandas scipy
+python3 python_polars/benchmark.py        # requires: pip install polars scipy
+octave --no-gui octave/benchmark.m
+python3 numba_bench/benchmark.py          # requires: pip install numba>=0.55
 Rscript r/benchmark.R
 ~/.juliaup/bin/julia julia/benchmark.jl
 ./rust/target/release/benchmark          # after building

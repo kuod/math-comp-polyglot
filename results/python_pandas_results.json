@@ -1,0 +1,103 @@
+{
+  "language": "Python (Pandas)",
+  "version": "Python 3.9.6 / Pandas 2.3.3",
+  "platform": "macOS-26.4.1-arm64-arm-64bit",
+  "operations": [
+    {
+      "name": "Matrix Multiply",
+      "description": "1000\u00d71000 DataFrame matrix multiplication (A @ B)",
+      "mean_ms": 8.514962699999979,
+      "std_ms": 0.400285030463316,
+      "min_ms": 8.086874999999939,
+      "memory_mb": 7.663428497314453
+    },
+    {
+      "name": "Matrix Inverse",
+      "description": "Inversion of 500\u00d7500 SPD DataFrame (numpy linalg on .values)",
+      "mean_ms": 2.927629100000017,
+      "std_ms": 0.08132144401625244,
+      "min_ms": 2.8277500000000177,
+      "memory_mb": 1.9088554382324219
+    },
+    {
+      "name": "LU Decomposition",
+      "description": "LU factorisation of 500\u00d7500 DataFrame (scipy on .values)",
+      "mean_ms": 4.626933500000008,
+      "std_ms": 1.956641157016449,
+      "min_ms": 2.6270840000000018,
+      "memory_mb": 5.735809326171875
+    },
+    {
+      "name": "Eigenvalue Decomp",
+      "description": "Full eigendecomposition of 300\u00d7300 symmetric DataFrame",
+      "mean_ms": 8.390337599999986,
+      "std_ms": 2.8599221263903014,
+      "min_ms": 6.257749999999951,
+      "memory_mb": 0.6902713775634766
+    },
+    {
+      "name": "Cholesky",
+      "description": "Cholesky factorisation of 500\u00d7500 SPD DataFrame",
+      "mean_ms": 1.657762500000026,
+      "std_ms": 1.3281542610395232,
+      "min_ms": 0.7584160000000395,
+      "memory_mb": 1.9088554382324219
+    },
+    {
+      "name": "SVD",
+      "description": "Full SVD of 500\u00d7300 DataFrame (numpy on .values)",
+      "mean_ms": 16.80341259999998,
+      "std_ms": 3.950038724462642,
+      "min_ms": 13.988791999999917,
+      "memory_mb": 1.8350601196289062
+    },
+    {
+      "name": "Linear System Solve",
+      "description": "Solve Ax=b for 1000\u00d71000 DataFrame A, Series b",
+      "mean_ms": 5.6773001000000045,
+      "std_ms": 0.13338237323609406,
+      "min_ms": 5.466082999999955,
+      "memory_mb": 0.00910186767578125
+    },
+    {
+      "name": "Vector Dot Product",
+      "description": "Dot product of two 10M-element Pandas Series (Series.dot)",
+      "mean_ms": 3.2716833999999024,
+      "std_ms": 0.26175188848531117,
+      "min_ms": 2.9674580000000894,
+      "memory_mb": 0.00226593017578125
+    },
+    {
+      "name": "Hadamard Product",
+      "description": "Element-wise multiply + add on 1000\u00d71000 DataFrames",
+      "mean_ms": 1.3059374000000012,
+      "std_ms": 0.042149337736623264,
+      "min_ms": 1.2685420000000391,
+      "memory_mb": 15.262649536132812
+    },
+    {
+      "name": "QR Decomposition",
+      "description": "QR factorisation of 500\u00d7500 DataFrame (numpy on .values)",
+      "mean_ms": 5.447945900000039,
+      "std_ms": 0.1691977511254991,
+      "min_ms": 5.2228340000000095,
+      "memory_mb": 5.96649169921875
+    },
+    {
+      "name": "FFT (real, 1M)",
+      "description": "Real FFT of 1M-element Series values (numpy rfft on .values)",
+      "mean_ms": 6.937958499999963,
+      "std_ms": 0.23997115422749682,
+      "min_ms": 6.5639589999997305,
+      "memory_mb": 8.00140380859375
+    },
+    {
+      "name": "Sort 10M floats",
+      "description": "Sort 10M-element Pandas Series (sort_values)",
+      "mean_ms": 1386.3568626000003,
+      "std_ms": 31.15284029322851,
+      "min_ms": 1363.6880419999998,
+      "memory_mb": 391.0074123382568
+    }
+  ]
+}
