@@ -771,6 +771,66 @@
   <h2>Appendix — Changelog</h2>
   <ul class="chg-list">
     <li class="chg-item">
+      <span class="chg-date">2026-04-25</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-new">new</span>
+        <strong>Added Python (Pandas), Python (Polars), and Octave</strong><br>
+        Python is now split into three variants.
+        <strong>Python (NumPy)</strong> is the original benchmark unchanged.
+        <strong>Python (Pandas)</strong> wraps all operations in DataFrames/Series,
+        using native <code>DataFrame @ DataFrame</code> matmul,
+        <code>Series.dot()</code>, <code>Series.sort_values()</code>, and
+        element-wise <code>df * df + df</code> for Hadamard;
+        numpy/scipy handle decompositions via <code>.to_numpy()</code>.
+        <strong>Python (Polars)</strong> uses Polars Series/DataFrames similarly —
+        notably, Polars' native radix sort (<strong>~75 ms</strong>) is 6× faster
+        than NumPy sort and 18× faster than Pandas sort for 10 M floats.
+        <strong>Octave 11.1.0</strong> runs all 12 operations through its
+        built-in BLAS/LAPACK, with JSON written without any package dependency.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-25</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Rust FFT corrected: full complex FFT → real-to-complex FFT</strong><br>
+        The Rust FFT benchmark was padding each real sample into a
+        <code>Complex::new(x, 0.0)</code> value and running a full N-point complex
+        FFT — roughly 2× the work of every other language, which all use a
+        real-to-complex FFT producing N/2+1 outputs.
+        Switched to the <code>realfft</code> crate (a thin wrapper around rustfft)
+        for a proper real-to-complex transform; plan creation moved to setup so
+        only the transform itself is timed.
+        Corrected Rust FFT: <strong>~4 ms</strong> (was ~8 ms).
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-25</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>SVD descriptions corrected from "Full" to "Economy"</strong><br>
+        Every language was computing a thin/economy SVD
+        (<code>full_matrices=False</code>, <code>thinSVD</code>,
+        <code>ComputeThinU|ComputeThinV</code>, <code>dgesdd 'S'</code>,
+        <code>svd 'econ'</code>) but all descriptions read "Full SVD".
+        Updated to "Economy SVD" with explicit output shapes (U: m×min(m,n))
+        across all 9 affected files.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-04-25</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>R and Octave FFT descriptions clarified</strong><br>
+        Neither R nor Octave has a native real-to-complex FFT.
+        Both call their full complex DFT (<code>fft()</code>) on real input,
+        returning N complex outputs rather than the N/2+1 outputs produced
+        by <code>rfft</code>-based implementations in other languages.
+        Descriptions updated to reflect this, explaining the large gap
+        (R: ~63 ms vs Python NumPy rfft: ~7 ms).
+      </span>
+    </li>
+    <li class="chg-item">
       <span class="chg-date">2026-03-26</span>
       <span class="chg-body">
         <span class="chg-tag chg-fix">fix</span>
