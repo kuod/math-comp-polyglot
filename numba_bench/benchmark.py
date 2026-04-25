@@ -249,7 +249,7 @@ def main():
         print(f"{r['mean_ms']:.2f} ms  ({r['memory_mb']:.2f} MB)")
 
     out = {
-        "language": "Numba",
+        "language": "Python (Numba)",
         "version": f"Python {sys.version.split()[0]} / Numba {numba.__version__}",
         "platform": platform.platform(),
         "operations": results,

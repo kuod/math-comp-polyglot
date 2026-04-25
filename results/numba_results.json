@@ -1,5 +1,5 @@
 {
-  "language": "Numba",
+  "language": "Python (Numba)",
   "version": "Python 3.13.11 / Numba 0.64.0",
   "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
   "operations": [
