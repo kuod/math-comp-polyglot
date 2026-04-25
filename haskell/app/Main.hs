@@ -151,7 +151,7 @@ operations =
             (forceM . chol . sym)
 
   , benchOp "SVD"
-            "Full SVD of 500x300 matrix"
+            "Economy SVD of 500x300 matrix (thinSVD; U:500x300)"
             (return (randMatrix 500 300))
             (\m -> let (u, s, v) = thinSVD m
                    in  forceM u >> forceV s >> forceM v)

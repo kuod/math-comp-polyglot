@@ -99,7 +99,7 @@ printf (' %.2f ms  (%.2f MB)\n', mean (times), mem_mb);
 
 %% ── 6. SVD ──────────────────────────────────────────────────────────────────
 name = 'SVD';
-desc = 'Economy SVD of 500x300 matrix';
+desc = 'Economy SVD of 500x300 matrix (U:500x300, S:300, V:300x300)';
 printf ('  Benchmarking: %s ...', name);
 for k = 1:N_WARMUP
   A = randn (500, 300); [U, S, V] = svd (A, 'econ');
@@ -186,7 +186,7 @@ printf (' %.2f ms  (%.2f MB)\n', mean (times), mem_mb);
 
 %% ── 11. FFT ─────────────────────────────────────────────────────────────────
 name = 'FFT (real, 1M)';
-desc = 'Real FFT of 2^20=1M-element vector (one-sided via fft)';
+desc = 'Full complex FFT sliced to N/2+1 (Octave fft; no native rfft)';
 printf ('  Benchmarking: %s ...', name);
 N_FFT = 2^20;
 for k = 1:N_WARMUP

@@ -1,5 +1,5 @@
 use nalgebra::{DMatrix, DVector, SymmetricEigen};
-use rustfft::{FftPlanner, num_complex::Complex};
+use realfft::RealFftPlanner;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rand_distr::{Distribution, StandardNormal};
@@ -246,7 +246,7 @@ fn main() {
     {
         let r = bench(
             "SVD",
-            "Full SVD of 500×300 matrix",
+            "Economy SVD of 500×300 matrix (nalgebra thin; U:500×300)",
             || rand_matrix(500, 300),
             |a| { black_box(a.svd(true, true)); },
         );
@@ -306,20 +306,21 @@ fn main() {
     {
         let r = bench(
             "FFT (real, 1M)",
-            "Real FFT of 2\u{00b2}\u{2070}=1M-element vector (rustfft)",
+            "Real-to-complex FFT of 2\u{00b2}\u{2070}=1M-element vector (realfft/rustfft, N/2+1 output)",
             || {
+                let n = 1 << 20;
                 let mut rng = make_rng();
-                (0..(1 << 20))
+                let data: Vec<f64> = (0..n)
                     .map(|_| StandardNormal.sample(&mut rng))
-                    .collect::<Vec<f64>>()
+                    .collect();
+                let mut planner = RealFftPlanner::<f64>::new();
+                let r2c = planner.plan_fft_forward(n);
+                let spectrum = r2c.make_output_vec();
+                (data, r2c, spectrum)
             },
-            |data| {
-                let mut planner = FftPlanner::new();
-                let fft = planner.plan_fft_forward(data.len());
-                let mut buf: Vec<Complex<f64>> =
-                    data.iter().map(|&x| Complex::new(x, 0.0)).collect();
-                fft.process(&mut buf);
-                black_box(buf);
+            |(mut data, r2c, mut spectrum)| {
+                r2c.process(&mut data, &mut spectrum).unwrap();
+                black_box(&spectrum);
             },
         );
         print_result(&r);

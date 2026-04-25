@@ -224,7 +224,7 @@ results.append(bench(
 // 6. SVD (dgesdd — divide and conquer)
 results.append(bench(
     name: "SVD",
-    description: "Full SVD of 500\u{d7}300 matrix (dgesdd, thin)",
+    description: "Economy SVD of 500\u{d7}300 matrix (dgesdd thin; U:500\u{d7}300)",
     memMB: matMB(500, 300) + vecMB(300) + matMB(300)
 ) {
     randMatrix(500, 300)

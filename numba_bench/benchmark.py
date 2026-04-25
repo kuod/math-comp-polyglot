@@ -196,7 +196,7 @@ OPERATIONS = [
     },
     {
         "name": "SVD",
-        "description": "Full SVD of 500×300 matrix (@njit → np.linalg.svd)",
+        "description": "Economy SVD of 500×300 matrix (@njit → np.linalg.svd; U:500×300)",
         "setup": lambda: (make_matrix(500, 300),),
         "op": lambda d: nb_svd(d[0]),
     },

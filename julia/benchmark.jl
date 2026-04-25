@@ -86,7 +86,7 @@ OPERATIONS = [
     ),
     (
         "SVD",
-        "Full SVD of 500×300 matrix",
+        "Economy SVD of 500×300 matrix (U:500×300, S:300, Vt:300×300)",
         () -> (make_matrix(500, 300),),
         d -> svd(d[1])
     ),

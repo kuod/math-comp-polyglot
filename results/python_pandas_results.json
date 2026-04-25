@@ -6,97 +6,97 @@
     {
       "name": "Matrix Multiply",
       "description": "1000\u00d71000 DataFrame matrix multiplication (A @ B)",
-      "mean_ms": 8.514962699999979,
-      "std_ms": 0.400285030463316,
-      "min_ms": 8.086874999999939,
+      "mean_ms": 8.367029199999998,
+      "std_ms": 0.2821599022748628,
+      "min_ms": 8.097790999999965,
       "memory_mb": 7.663428497314453
     },
     {
       "name": "Matrix Inverse",
       "description": "Inversion of 500\u00d7500 SPD DataFrame (numpy linalg on .values)",
-      "mean_ms": 2.927629100000017,
-      "std_ms": 0.08132144401625244,
-      "min_ms": 2.8277500000000177,
+      "mean_ms": 4.9430210000000026,
+      "std_ms": 3.8063477039953413,
+      "min_ms": 3.153041999999995,
       "memory_mb": 1.9088554382324219
     },
     {
       "name": "LU Decomposition",
       "description": "LU factorisation of 500\u00d7500 DataFrame (scipy on .values)",
-      "mean_ms": 4.626933500000008,
-      "std_ms": 1.956641157016449,
-      "min_ms": 2.6270840000000018,
+      "mean_ms": 7.614250299999947,
+      "std_ms": 4.790685533890789,
+      "min_ms": 3.2607499999999234,
       "memory_mb": 5.735809326171875
     },
     {
       "name": "Eigenvalue Decomp",
       "description": "Full eigendecomposition of 300\u00d7300 symmetric DataFrame",
-      "mean_ms": 8.390337599999986,
-      "std_ms": 2.8599221263903014,
-      "min_ms": 6.257749999999951,
+      "mean_ms": 12.892812599999948,
+      "std_ms": 2.678561709656592,
+      "min_ms": 8.100624999999972,
       "memory_mb": 0.6902713775634766
     },
     {
       "name": "Cholesky",
       "description": "Cholesky factorisation of 500\u00d7500 SPD DataFrame",
-      "mean_ms": 1.657762500000026,
-      "std_ms": 1.3281542610395232,
-      "min_ms": 0.7584160000000395,
+      "mean_ms": 0.7677208999999907,
+      "std_ms": 0.005051862892996889,
+      "min_ms": 0.761624999999988,
       "memory_mb": 1.9088554382324219
     },
     {
       "name": "SVD",
-      "description": "Full SVD of 500\u00d7300 DataFrame (numpy on .values)",
-      "mean_ms": 16.80341259999998,
-      "std_ms": 3.950038724462642,
-      "min_ms": 13.988791999999917,
+      "description": "Economy SVD of 500\u00d7300 DataFrame (numpy on .values; U:500\u00d7300)",
+      "mean_ms": 15.172712500000008,
+      "std_ms": 0.7074719696396445,
+      "min_ms": 14.170417000000102,
       "memory_mb": 1.8350601196289062
     },
     {
       "name": "Linear System Solve",
       "description": "Solve Ax=b for 1000\u00d71000 DataFrame A, Series b",
-      "mean_ms": 5.6773001000000045,
-      "std_ms": 0.13338237323609406,
-      "min_ms": 5.466082999999955,
+      "mean_ms": 5.947308299999987,
+      "std_ms": 0.49435220431064447,
+      "min_ms": 5.4902080000001074,
       "memory_mb": 0.00910186767578125
     },
     {
       "name": "Vector Dot Product",
       "description": "Dot product of two 10M-element Pandas Series (Series.dot)",
-      "mean_ms": 3.2716833999999024,
-      "std_ms": 0.26175188848531117,
-      "min_ms": 2.9674580000000894,
+      "mean_ms": 3.223358300000045,
+      "std_ms": 0.19492219795250376,
+      "min_ms": 3.085834000000176,
       "memory_mb": 0.00226593017578125
     },
     {
       "name": "Hadamard Product",
       "description": "Element-wise multiply + add on 1000\u00d71000 DataFrames",
-      "mean_ms": 1.3059374000000012,
-      "std_ms": 0.042149337736623264,
-      "min_ms": 1.2685420000000391,
+      "mean_ms": 1.3728251000000302,
+      "std_ms": 0.09471130832214943,
+      "min_ms": 1.2722920000003413,
       "memory_mb": 15.262649536132812
     },
     {
       "name": "QR Decomposition",
       "description": "QR factorisation of 500\u00d7500 DataFrame (numpy on .values)",
-      "mean_ms": 5.447945900000039,
-      "std_ms": 0.1691977511254991,
-      "min_ms": 5.2228340000000095,
+      "mean_ms": 5.813637699999985,
+      "std_ms": 0.4377401773868518,
+      "min_ms": 5.249082999999821,
       "memory_mb": 5.96649169921875
     },
     {
       "name": "FFT (real, 1M)",
       "description": "Real FFT of 1M-element Series values (numpy rfft on .values)",
-      "mean_ms": 6.937958499999963,
-      "std_ms": 0.23997115422749682,
-      "min_ms": 6.5639589999997305,
+      "mean_ms": 7.0952667999999885,
+      "std_ms": 0.5577644952656821,
+      "min_ms": 6.436083000000092,
       "memory_mb": 8.00140380859375
     },
     {
       "name": "Sort 10M floats",
       "description": "Sort 10M-element Pandas Series (sort_values)",
-      "mean_ms": 1386.3568626000003,
-      "std_ms": 31.15284029322851,
-      "min_ms": 1363.6880419999998,
+      "mean_ms": 1400.9894247000007,
+      "std_ms": 16.036051834822256,
+      "min_ms": 1389.3506660000003,
       "memory_mb": 391.0074123382568
     }
   ]

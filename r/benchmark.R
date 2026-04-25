@@ -91,7 +91,7 @@ OPERATIONS <- list(
   ),
   list(
     name        = "SVD",
-    description = "Full SVD of 500×300 matrix",
+    description = "Economy SVD of 500×300 matrix (U:500×300, S:300, Vt:300×300)",
     setup       = function() list(make_matrix(500, 300)),
     op          = function(d) svd(d[[1]])
   ),
@@ -121,7 +121,7 @@ OPERATIONS <- list(
   ),
   list(
     name        = "FFT (real, 1M)",
-    description = "Real FFT of 2^20=1M-element vector (base R fft)",
+    description = "Full complex DFT of 2^20=1M-element real vector (base R fft; no native rfft)",
     setup       = function() list(rnorm(2^20)),
     op          = function(d) fft(d[[1]])
   ),

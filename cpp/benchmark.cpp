@@ -178,7 +178,7 @@ int main() {
 
     // 6. SVD — U:500×300, S:300, Vt:300×300
     results.push_back(bench(
-        "SVD", "Full SVD of 500×300 matrix",
+        "SVD", "Economy SVD of 500×300 matrix (ComputeThinU|ComputeThinV; U:500×300)",
         mat_mb(500,300) + vec_mb(300) + mat_mb(300),
         []{ return rand_matrix(500, 300); },
         [](auto& a){ BDCSVD<MatrixXd> svd(a, ComputeThinU | ComputeThinV); do_not_optimise(svd.singularValues()); }

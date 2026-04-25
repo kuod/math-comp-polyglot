@@ -96,7 +96,7 @@ OPERATIONS = [
     },
     {
         "name": "SVD",
-        "description": "Full SVD of 500×300 DataFrame (numpy on .values)",
+        "description": "Economy SVD of 500×300 DataFrame (numpy on .values; U:500×300)",
         "setup": lambda: (pd.DataFrame(make_matrix(500, 300)),),
         "op": lambda d: np.linalg.svd(d[0].to_numpy(), full_matrices=False),
     },

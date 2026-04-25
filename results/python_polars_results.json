@@ -6,97 +6,97 @@
     {
       "name": "Matrix Multiply",
       "description": "1000\u00d71000 DataFrame matmul (numpy on .to_numpy(), result as DataFrame)",
-      "mean_ms": 16.990191799999987,
-      "std_ms": 0.2694237525753087,
-      "min_ms": 16.74074999999997,
+      "mean_ms": 18.645149999999987,
+      "std_ms": 2.5141706373789416,
+      "min_ms": 17.058249999999997,
       "memory_mb": 15.477665138244628
     },
     {
       "name": "Matrix Inverse",
       "description": "Inversion of 500\u00d7500 SPD DataFrame (numpy on .to_numpy())",
-      "mean_ms": 6.7157499999999875,
-      "std_ms": 0.21126573430584872,
-      "min_ms": 6.4577910000001015,
+      "mean_ms": 7.881916799999999,
+      "std_ms": 0.660911719819334,
+      "min_ms": 7.191334000000049,
       "memory_mb": 3.9240922927856445
     },
     {
       "name": "LU Decomposition",
       "description": "LU factorisation of 500\u00d7500 DataFrame (scipy on .to_numpy())",
-      "mean_ms": 9.72140829999999,
-      "std_ms": 4.055016270904441,
-      "min_ms": 3.0562499999999826,
+      "mean_ms": 13.331287699999994,
+      "std_ms": 7.131789575232254,
+      "min_ms": 4.136083999999984,
       "memory_mb": 5.735816955566406
     },
     {
       "name": "Eigenvalue Decomp",
       "description": "Full eigendecomposition of 300\u00d7300 symmetric DataFrame",
-      "mean_ms": 14.754008400000028,
-      "std_ms": 4.689171537627223,
-      "min_ms": 6.349917000000094,
+      "mean_ms": 11.011995700000002,
+      "std_ms": 3.5732887543417853,
+      "min_ms": 7.701165999999926,
       "memory_mb": 0.6902637481689453
     },
     {
       "name": "Cholesky",
       "description": "Cholesky factorisation of 500\u00d7500 SPD DataFrame",
-      "mean_ms": 4.7362459000000126,
-      "std_ms": 0.06198757791112518,
-      "min_ms": 4.635833000000034,
+      "mean_ms": 5.4287545000000215,
+      "std_ms": 1.05195243917922,
+      "min_ms": 4.782000000000064,
       "memory_mb": 3.9240922927856445
     },
     {
       "name": "SVD",
-      "description": "Full SVD of 500\u00d7300 DataFrame (numpy on .to_numpy())",
-      "mean_ms": 13.940245799999975,
-      "std_ms": 0.17012272958885574,
-      "min_ms": 13.631791999999976,
+      "description": "Economy SVD of 500\u00d7300 DataFrame (numpy on .to_numpy(); U:500\u00d7300)",
+      "mean_ms": 14.178208300000051,
+      "std_ms": 0.3931405827156842,
+      "min_ms": 13.77204200000004,
       "memory_mb": 1.835052490234375
     },
     {
       "name": "Linear System Solve",
       "description": "Solve Ax=b for 1000\u00d71000 DataFrame A, Series b",
-      "mean_ms": 5.42967059999997,
-      "std_ms": 0.4317525489308135,
-      "min_ms": 5.0422079999998815,
+      "mean_ms": 5.921828999999956,
+      "std_ms": 0.611986904191756,
+      "min_ms": 5.223332999999997,
       "memory_mb": 0.00885772705078125
     },
     {
       "name": "Vector Dot Product",
       "description": "Dot product of two 10M-element Polars Series ((s1 * s2).sum())",
-      "mean_ms": 12.370049999999999,
-      "std_ms": 0.36156066197273357,
-      "min_ms": 11.809750000000285,
+      "mean_ms": 13.511537500000026,
+      "std_ms": 1.3300031494554951,
+      "min_ms": 12.266875000000343,
       "memory_mb": 0.00018310546875
     },
     {
       "name": "Hadamard Product",
       "description": "Element-wise multiply + add on 1000\u00d71000 DataFrames (numpy via .to_numpy())",
-      "mean_ms": 8.346433399999986,
-      "std_ms": 0.14866472086953586,
-      "min_ms": 8.13954100000025,
+      "mean_ms": 9.6436792,
+      "std_ms": 1.3735947867417948,
+      "min_ms": 8.487290999999786,
       "memory_mb": 7.848145484924316
     },
     {
       "name": "QR Decomposition",
       "description": "QR factorisation of 500\u00d7500 DataFrame (numpy on .to_numpy())",
-      "mean_ms": 5.5160916000000615,
-      "std_ms": 0.16393263414411066,
-      "min_ms": 5.350292000000145,
+      "mean_ms": 5.992995700000048,
+      "std_ms": 0.8088965700002001,
+      "min_ms": 5.4691249999994085,
       "memory_mb": 6.0288848876953125
     },
     {
       "name": "FFT (real, 1M)",
       "description": "Real FFT of 1M-element Polars Series (numpy rfft on .to_numpy())",
-      "mean_ms": 6.769404000000101,
-      "std_ms": 0.21468709771284056,
-      "min_ms": 6.550958000000051,
+      "mean_ms": 15.103112600000035,
+      "std_ms": 19.403222559387455,
+      "min_ms": 6.739917000000872,
       "memory_mb": 8.001495361328125
     },
     {
       "name": "Sort 10M floats",
       "description": "Sort 10M-element Polars Series (native radix sort)",
-      "mean_ms": 75.40536670000009,
-      "std_ms": 1.1885210433282716,
-      "min_ms": 73.46445800000012,
+      "mean_ms": 87.28248729999999,
+      "std_ms": 11.854921976503523,
+      "min_ms": 77.13379099999962,
       "memory_mb": 0.00018310546875
     }
   ]
