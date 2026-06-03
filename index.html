@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Numerical Computing Benchmark: 8 Languages · 12 Operations</title>
+<title>Numerical Computing Benchmark: 12 Languages · 12 Operations</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -256,6 +256,7 @@
     vertical-align: middle;
     color: #fff;
   }
+  .chg-new  { background: #8e44ad; }
   .chg-fix  { background: #e05252; }
   .chg-feat { background: #2ecc71; }
   .chg-data { background: #3498db; }
@@ -305,7 +306,7 @@
 
     <div class="exec-card">
       <div class="exec-label">Two Performance Tiers</div>
-      <p><strong>BLAS/LAPACK-linked</strong> (Haskell, Julia, R, Swift): call
+      <p><strong>BLAS/LAPACK-linked</strong> (Haskell, Julia, Python (NumPy), Python (Pandas), Python (Polars), R, Swift): call
         hand-optimised vendor routines (Apple Accelerate on this machine) for
         dense matrix work — typically 5–20× faster than pure implementations on
         large factorisation benchmarks.</p>

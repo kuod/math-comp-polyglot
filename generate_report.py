@@ -544,7 +544,7 @@ def generate_html(data: dict) -> str:
     mem_winner_meta = LANG_META.get(mem_winner, {"color": "#888"})
 
     # Languages that link system BLAS/LAPACK (fast on dense ops)
-    blas_langs = {"Python", "R", "Julia", "Haskell", "Swift"}
+    blas_langs = {"Python (NumPy)", "Python (Pandas)", "Python (Polars)", "R", "Julia", "Haskell", "Swift"}
     pure_langs  = {"Rust", "C++", "Go"}
 
     # Find top performer per op
@@ -782,7 +782,7 @@ def generate_html(data: dict) -> str:
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Numerical Computing Benchmark: 8 Languages · 12 Operations</title>
+<title>Numerical Computing Benchmark: {len(langs)} Languages · {len(op_names)} Operations</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -1035,6 +1035,7 @@ def generate_html(data: dict) -> str:
     vertical-align: middle;
     color: #fff;
   }}
+  .chg-new  {{ background: #8e44ad; }}
   .chg-fix  {{ background: #e05252; }}
   .chg-feat {{ background: #2ecc71; }}
   .chg-data {{ background: #3498db; }}

@@ -186,7 +186,7 @@ printf (' %.2f ms  (%.2f MB)\n', mean (times), mem_mb);
 
 %% ── 11. FFT ─────────────────────────────────────────────────────────────────
 name = 'FFT (real, 1M)';
-desc = 'Full complex FFT sliced to N/2+1 (Octave fft; no native rfft)';
+desc = 'Full complex FFT of 2^20 real samples (Octave fft; no native rfft; slice to N/2+1 outside timer)';
 printf ('  Benchmarking: %s ...', name);
 N_FFT = 2^20;
 for k = 1:N_WARMUP
@@ -195,7 +195,8 @@ end
 times = zeros (1, N_RUNS);
 for k = 1:N_RUNS
   v = randn (N_FFT, 1);
-  tic; f = fft (v); f = f(1:N_FFT/2+1); times(k) = toc () * 1000;
+  tic; f = fft (v); times(k) = toc () * 1000;
+  f = f(1:N_FFT/2+1);
 end
 mem_mb = ((N_FFT / 2 + 1) * 16) / 1024^2;  % complex doubles
 results{end+1} = struct ('name', name, 'description', desc, ...
