@@ -147,13 +147,9 @@ OPERATIONS = [
         "setup": lambda: (jnp.array(np.random.default_rng(SEED).standard_normal(1 << 20)),),
         "op": lambda d: jnp.fft.rfft(d[0]),
     },
-    {
-        "name": "Sort 10M floats",
-        "description": "Sort of 10M random float64 values (jnp.sort, XLA bitonic; GPU-optimised, slow on CPU)",
-        "mem_mb": vec_mb(10_000_000),
-        "setup": lambda: (jnp.array(np.random.default_rng(SEED).standard_normal(10_000_000)),),
-        "op": lambda d: jnp.sort(d[0]),
-    },
+    # Sort omitted: jnp.sort uses XLA's bitonic algorithm, which is GPU-optimised
+    # and ~50x slower than numpy.sort on CPU (5900ms vs 60-400ms), distorting
+    # the report's heatmap colour scale for the entire Sort column.
 ]
 
 

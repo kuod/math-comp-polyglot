@@ -278,11 +278,16 @@ PROGRAM benchmark
   ! ═══════════════════════════════════════════════════════════════════════════
   iop = 7
   op_names(iop) = "Linear System Solve"
-  op_descs(iop) = "Solve Ax=b for 1000x1000 A, 1000 b (DGESV/Accelerate)"
+  op_descs(iop) = "Solve Ax=b for 1000x1000 SPD A, 1000 b (DGESV/Accelerate)"
   op_mem(iop)   = vec_mb(1000)
 
-  ALLOCATE(A(1000,1000), btmp1(1000), btmp2(1000), Atmp(1000,1000), IPIV(1000))
-  CALL fill_randn(A, 1000, 1000, SEED+7)
+  ALLOCATE(A(1000,1000), B(1000,1000), btmp1(1000), btmp2(1000), Atmp(1000,1000), IPIV(1000))
+  ! Build SPD: A = B*B^T + 1000*I (matches all other languages)
+  CALL fill_randn(B, 1000, 1000, SEED+7)
+  CALL DGEMM('N','T',1000,1000,1000,1.0D0,B,1000,B,1000,0.0D0,A,1000)
+  DO i = 1, 1000
+    A(i,i) = A(i,i) + 1000.0D0
+  END DO
   CALL fill_randn_vec(btmp1, 1000, SEED+8)
   ! Warmup
   DO warmup = 1, N_WARMUP
@@ -300,7 +305,7 @@ PROGRAM benchmark
     times_ms(run) = DBLE(t_stop - t_start) * 1000.0D0 / DBLE(t_rate)
   END DO
   IF (btmp2(1) > 1.0D20) STOP "dead code elimination guard"
-  DEALLOCATE(A, btmp1, btmp2, Atmp, IPIV)
+  DEALLOCATE(A, B, btmp1, btmp2, Atmp, IPIV)
   CALL compute_stats(times_ms, N_RUNS, t_mean, t_var, t_min)
   op_mean(iop) = t_mean; op_std(iop) = t_var; op_min(iop) = t_min
   WRITE(*,'("  Benchmarking: ",A30," ... ",F8.2," ms  (",F6.2," MB)")') &
@@ -404,7 +409,7 @@ PROGRAM benchmark
   ! 11. Sort 10M floats — recursive quicksort
   ! ═══════════════════════════════════════════════════════════════════════════
   iop = 11
-  op_names(iop) = "Sort"
+  op_names(iop) = "Sort 10M floats"
   op_descs(iop) = "Unstable sort of 10M random float64 values (Fortran quicksort)"
   op_mem(iop)   = vec_mb(10000000)
 

@@ -597,7 +597,7 @@ int main(void) {
 
         /* warmup */
         for (int w = 0; w < N_WARMUP; w++) {
-            vDSP_ctozD((DSPDoubleComplex *)x, 2, &z, 1, HALF);
+            vDSP_ctozD((DSPDoubleComplex *)x, 1, &z, 1, HALF);
             vDSP_fft_zripD(fft_setup, &z, 1, LOG2N, FFT_FORWARD);
             g_sink += realp[0];
         }
@@ -605,7 +605,7 @@ int main(void) {
         /* timed runs */
         for (int r = 0; r < N_RUNS; r++) {
             double t0 = now_ms();
-            vDSP_ctozD((DSPDoubleComplex *)x, 2, &z, 1, HALF);
+            vDSP_ctozD((DSPDoubleComplex *)x, 1, &z, 1, HALF);
             vDSP_fft_zripD(fft_setup, &z, 1, LOG2N, FFT_FORWARD);
             times[r] = now_ms() - t0;
             g_sink += realp[0];
