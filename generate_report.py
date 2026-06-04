@@ -31,6 +31,23 @@ _NUMBA_SVG = (
     '</svg>'
 )
 
+_C_SVG = (
+    '<svg class="lang-svg" viewBox="0 0 24 24" '
+    'xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+    '<path fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" '
+    'd="M19.5 7.5A9 9 0 1 0 19.5 16.5"/>'
+    '</svg>'
+)
+
+_FORTRAN_SVG = (
+    '<svg class="lang-svg" viewBox="0 0 24 24" '
+    'xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor">'
+    '<rect x="4" y="3" width="2.5" height="18"/>'
+    '<rect x="4" y="3" width="14" height="2.5"/>'
+    '<rect x="4" y="11" width="10" height="2.5"/>'
+    '</svg>'
+)
+
 _PYTHON_PATH = ("M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46"
                 "-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32"
                 "-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26"
@@ -108,6 +125,12 @@ LANG_META = {
                 "logo": _svg("M1.811 10.231c-.047 0-.058-.023-.035-.059l.246-.315c.023-.035.081-.058.128-.058h4.172c.046 0 .058.035.035.07l-.199.303c-.023.036-.082.07-.117.07zM.047 11.306c-.047 0-.059-.023-.035-.058l.245-.316c.023-.035.082-.058.129-.058h5.328c.047 0 .07.035.058.07l-.093.28c-.012.047-.058.07-.105.07zm2.828 1.075c-.047 0-.059-.035-.035-.07l.163-.292c.023-.035.07-.07.117-.07h2.337c.047 0 .07.035.07.082l-.023.28c0 .047-.047.082-.082.082zm12.129-2.36c-.736.187-1.239.327-1.963.514-.176.046-.187.058-.34-.117-.174-.199-.303-.327-.548-.444-.737-.362-1.45-.257-2.115.175-.795.514-1.204 1.274-1.192 2.22.011.935.654 1.706 1.577 1.835.795.105 1.46-.175 1.987-.77.105-.13.198-.27.315-.434H10.47c-.245 0-.304-.152-.222-.35.152-.362.432-.97.596-1.274a.315.315 0 01.292-.187h4.253c-.023.316-.023.631-.07.947a4.983 4.983 0 01-.958 2.29c-.841 1.11-1.94 1.8-3.33 1.986-1.145.152-2.209-.07-3.143-.77-.865-.655-1.356-1.52-1.484-2.595-.152-1.274.222-2.419.993-3.424.83-1.086 1.928-1.776 3.272-2.02 1.098-.2 2.15-.07 3.096.571.62.41 1.063.97 1.356 1.648.07.105.023.164-.117.2m3.868 6.461c-1.064-.024-2.034-.328-2.852-1.029a3.665 3.665 0 01-1.262-2.255c-.21-1.32.152-2.489.947-3.529.853-1.122 1.881-1.706 3.272-1.95 1.192-.21 2.314-.095 3.33.595.923.63 1.496 1.484 1.648 2.605.198 1.578-.257 2.863-1.344 3.962-.771.783-1.718 1.273-2.805 1.495-.315.06-.63.07-.934.106zm2.78-4.72c-.011-.153-.011-.27-.034-.387-.21-1.157-1.274-1.81-2.384-1.554-1.087.245-1.788.935-2.045 2.033-.21.912.234 1.835 1.075 2.21.643.28 1.285.244 1.905-.07.923-.48 1.425-1.228 1.484-2.233z")},
     "Python (Numba)": {"color": "#27AE60", "bg": "#E9F7EF", "chart_label": "⚡",
                        "logo": _NUMBA_SVG},
+    "Python (JAX)":  {"color": "#4285F4", "bg": "#E8F0FE", "chart_label": "JAX",
+                      "logo": _svg(_PYTHON_PATH)},
+    "C":             {"color": "#A8B9CC", "bg": "#F4F6F9", "chart_label": "C",
+                      "logo": _C_SVG},
+    "Fortran":       {"color": "#734F96", "bg": "#F3EEF9", "chart_label": "Fo",
+                      "logo": _FORTRAN_SVG},
 }
 
 LANG_MEMORY_NOTE = {
@@ -123,6 +146,9 @@ LANG_MEMORY_NOTE = {
     "Swift":   "output matrix size (Accelerate uses malloc directly)",
     "Go":      "runtime.TotalAlloc delta (cumulative bytes allocated)",
     "Python (Numba)": "tracemalloc peak (Python-managed heap; output arrays via NumPy)",
+    "Python (JAX)":  "theoretical output size (XLA allocations bypass tracemalloc)",
+    "C":             "theoretical output matrix size (malloc directly)",
+    "Fortran":       "theoretical output matrix size (ALLOCATE/LAPACK directly)",
 }
 
 FILE_MAP = {
@@ -138,6 +164,9 @@ FILE_MAP = {
     "Swift":   "swift_results.json",
     "Go":      "go_results.json",
     "Python (Numba)": "numba_results.json",
+    "Python (JAX)":  "python_jax_results.json",
+    "C":             "c_results.json",
+    "Fortran":       "fortran_results.json",
 }
 
 
@@ -544,7 +573,8 @@ def generate_html(data: dict) -> str:
     mem_winner_meta = LANG_META.get(mem_winner, {"color": "#888"})
 
     # Languages that link system BLAS/LAPACK (fast on dense ops)
-    blas_langs = {"Python (NumPy)", "Python (Pandas)", "Python (Polars)", "R", "Julia", "Haskell", "Swift"}
+    blas_langs = {"Python (NumPy)", "Python (Pandas)", "Python (Polars)", "Python (JAX)",
+                  "R", "Julia", "Haskell", "Swift", "C", "Fortran"}
     pure_langs  = {"Rust", "C++", "Go"}
 
     # Find top performer per op

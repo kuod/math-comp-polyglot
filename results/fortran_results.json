@@ -1,0 +1,95 @@
+{
+  "language": "Fortran",
+  "version": "GNU Fortran GCC version 15.2.0",
+  "platform": "macOS",
+  "operations": [
+    {
+      "name": "Matrix Multiply",
+      "description": "1000x1000 DGEMM (BLAS/Accelerate)",
+      "mean_ms":     7.239200,
+      "std_ms":     0.214963,
+      "min_ms":     6.996000,
+      "memory_mb":     7.629395
+    },
+    {
+      "name": "Matrix Inverse",
+      "description": "Inversion of 500x500 SPD matrix (DGETRF+DGETRI/Accelerate)",
+      "mean_ms":     2.303300,
+      "std_ms":     0.024992,
+      "min_ms":     2.266000,
+      "memory_mb":     1.907349
+    },
+    {
+      "name": "LU Decomposition",
+      "description": "LU factorisation of 500x500 matrix (DGETRF/Accelerate)",
+      "mean_ms":     1.124100,
+      "std_ms":     0.005319,
+      "min_ms":     1.120000,
+      "memory_mb":     1.907349
+    },
+    {
+      "name": "Eigenvalue Decomp",
+      "description": "Full eigendecomposition of 300x300 symmetric matrix (DSYEV/Accelerate)",
+      "mean_ms":    24.348800,
+      "std_ms":     0.079278,
+      "min_ms":    24.287000,
+      "memory_mb":     0.688934
+    },
+    {
+      "name": "Cholesky",
+      "description": "Cholesky factorisation of 500x500 SPD matrix (DPOTRF/Accelerate)",
+      "mean_ms":     0.328600,
+      "std_ms":     0.000917,
+      "min_ms":     0.328000,
+      "memory_mb":     1.907349
+    },
+    {
+      "name": "SVD",
+      "description": "Economy SVD of 500x300 matrix (DGESDD/Accelerate; U:500x300)",
+      "mean_ms":    13.102000,
+      "std_ms":     0.148085,
+      "min_ms":    12.919000,
+      "memory_mb":     1.833344
+    },
+    {
+      "name": "Linear System Solve",
+      "description": "Solve Ax=b for 1000x1000 A, 1000 b (DGESV/Accelerate)",
+      "mean_ms":     5.181100,
+      "std_ms":     0.253808,
+      "min_ms":     4.891000,
+      "memory_mb":     0.007629
+    },
+    {
+      "name": "Vector Dot Product",
+      "description": "Dot product of two 10M-element vectors (DDOT/Accelerate)",
+      "mean_ms":     3.013200,
+      "std_ms":     0.378897,
+      "min_ms":     2.648000,
+      "memory_mb":     0.000008
+    },
+    {
+      "name": "Hadamard Product",
+      "description": "Element-wise multiply + add on 1000x1000 matrices (Fortran array ops)",
+      "mean_ms":     0.598100,
+      "std_ms":     0.080764,
+      "min_ms":     0.550000,
+      "memory_mb":     7.629395
+    },
+    {
+      "name": "QR Decomposition",
+      "description": "QR factorisation of 500x500 matrix (DGEQRF/Accelerate)",
+      "mean_ms":     2.250900,
+      "std_ms":     0.060136,
+      "min_ms":     2.210000,
+      "memory_mb":     1.907349
+    },
+    {
+      "name": "Sort",
+      "description": "Unstable sort of 10M random float64 values (Fortran quicksort)",
+      "mean_ms":   989.363500,
+      "std_ms":     2.219440,
+      "min_ms":   987.133000,
+      "memory_mb":    76.293945
+    }
+  ]
+}

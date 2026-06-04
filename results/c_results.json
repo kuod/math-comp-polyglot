@@ -1,0 +1,103 @@
+{
+  "language": "C",
+  "version": "C (clang/Accelerate)",
+  "platform": "Darwin 25.5.0 arm64",
+  "operations": [
+    {
+      "name": "Matrix Multiply",
+      "description": "1000x1000 DGEMM (CBLAS/Accelerate)",
+      "mean_ms": 7.293,
+      "std_ms": 0.220938,
+      "min_ms": 7.013,
+      "memory_mb": 7.62939
+    },
+    {
+      "name": "Matrix Inverse",
+      "description": "Inversion of 500x500 SPD matrix (DGETRF+DGETRI/Accelerate)",
+      "mean_ms": 2.0323,
+      "std_ms": 0.0285764,
+      "min_ms": 1.999,
+      "memory_mb": 1.90735
+    },
+    {
+      "name": "LU Decomposition",
+      "description": "LU factorisation of 500x500 matrix (DGETRF/Accelerate)",
+      "mean_ms": 1.1497,
+      "std_ms": 0.00756375,
+      "min_ms": 1.139,
+      "memory_mb": 1.90735
+    },
+    {
+      "name": "Eigenvalue Decomp",
+      "description": "Full eigendecomposition of 300x300 symmetric matrix (DSYEV/Accelerate)",
+      "mean_ms": 20.6214,
+      "std_ms": 0.104806,
+      "min_ms": 20.521,
+      "memory_mb": 0.688934
+    },
+    {
+      "name": "Cholesky",
+      "description": "Cholesky factorisation of 500x500 SPD matrix (DPOTRF/Accelerate)",
+      "mean_ms": 0.2855,
+      "std_ms": 0.0147935,
+      "min_ms": 0.273,
+      "memory_mb": 1.90735
+    },
+    {
+      "name": "SVD",
+      "description": "Economy SVD of 500x300 matrix (DGESDD/Accelerate; U:500x300)",
+      "mean_ms": 13.2322,
+      "std_ms": 0.0760484,
+      "min_ms": 13.165,
+      "memory_mb": 1.83334
+    },
+    {
+      "name": "Linear System Solve",
+      "description": "Solve Ax=b for 1000x1000 A, 1000 b (DGESV/Accelerate)",
+      "mean_ms": 4.1423,
+      "std_ms": 0.224402,
+      "min_ms": 3.921,
+      "memory_mb": 0.00762939
+    },
+    {
+      "name": "Vector Dot Product",
+      "description": "Dot product of two 10M-element vectors (cblas_ddot/Accelerate)",
+      "mean_ms": 2.9046,
+      "std_ms": 0.39147,
+      "min_ms": 2.662,
+      "memory_mb": 7.62939e-06
+    },
+    {
+      "name": "Hadamard Product",
+      "description": "Element-wise multiply + add on 1000x1000 matrices",
+      "mean_ms": 0.5614,
+      "std_ms": 0.0275035,
+      "min_ms": 0.54,
+      "memory_mb": 7.62939
+    },
+    {
+      "name": "QR Decomposition",
+      "description": "QR factorisation of 500x500 matrix (DGEQRF/Accelerate)",
+      "mean_ms": 2.2302,
+      "std_ms": 0.0386828,
+      "min_ms": 2.208,
+      "memory_mb": 1.90735
+    },
+    {
+      "name": "FFT (real, 1M)",
+      "description": "Real FFT of 2^20=1M samples (vDSP_fft_zripD/Accelerate; double precision)",
+      "mean_ms": 5.0053,
+      "std_ms": 0.0639438,
+      "min_ms": 4.91,
+      "memory_mb": 8.00002
+    },
+    {
+      "name": "Sort 10M floats",
+      "description": "Unstable sort of 10M random float64 values (qsort/stdlib)",
+      "mean_ms": 1159.17,
+      "std_ms": 4.59717,
+      "min_ms": 1153.18,
+      "memory_mb": 76.2939
+    }
+  ]
+}

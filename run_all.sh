@@ -172,6 +172,47 @@ else
     skip "go not found"
 fi
 
+# ── Python (JAX) ─────────────────────────────────────────────────────────────
+if command -v python3 &>/dev/null && python3 -c "import jax" &>/dev/null 2>&1; then
+    log "Running Python (JAX) benchmark..."
+    cd "$ROOT"
+    python3 python_jax/benchmark.py
+else
+    skip "jax not importable (pip install jax)"
+fi
+
+# ── C (Accelerate) ───────────────────────────────────────────────────────────
+if command -v clang &>/dev/null; then
+    log "Building C benchmark..."
+    clang -O3 -march=native -framework Accelerate -DACCELERATE_NEW_LAPACK \
+        -Wno-deprecated-declarations \
+        -o "$ROOT/c/c-bench" "$ROOT/c/benchmark.c" -lm
+    log "Running C benchmark..."
+    cd "$ROOT"
+    ./c/c-bench
+else
+    skip "clang not found"
+fi
+
+# ── Fortran (Accelerate) ─────────────────────────────────────────────────────
+GFORTRAN_BIN=""
+for p in gfortran /opt/homebrew/bin/gfortran /usr/local/bin/gfortran; do
+    if command -v "$p" &>/dev/null 2>&1 || [ -x "$p" ]; then
+        GFORTRAN_BIN="$p"; break
+    fi
+done
+
+if [ -n "$GFORTRAN_BIN" ]; then
+    log "Building Fortran benchmark..."
+    "$GFORTRAN_BIN" -O3 -march=native -framework Accelerate \
+        -o "$ROOT/fortran/fortran-bench" "$ROOT/fortran/benchmark.f90"
+    log "Running Fortran benchmark..."
+    cd "$ROOT"
+    ./fortran/fortran-bench
+else
+    skip "gfortran not found (brew install gcc)"
+fi
+
 # ── Octave ───────────────────────────────────────────────────────────────────
 if command -v octave &>/dev/null; then
     log "Running Octave benchmark..."

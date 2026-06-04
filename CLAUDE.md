@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project does
 
-Benchmarks 12 numerical/linear-algebra operations across Python (NumPy), Python (Pandas), Python (Polars), Octave, R, Julia, Rust, C++, Haskell, Swift, Go, and Numba. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `index.html`.
+Benchmarks 12 numerical/linear-algebra operations across Python (NumPy), Python (Pandas), Python (Polars), Python (JAX), Python (Numba), Octave, R, Julia, Rust, C++, C, Fortran, Haskell, Swift, and Go. Each language writes a `results/<lang>_results.json` file; `generate_report.py` reads those and produces a self-contained `index.html`.
 
 ## Running benchmarks
 
@@ -18,6 +18,7 @@ python3 python_pandas/benchmark.py        # requires: pip install pandas scipy
 python3 python_polars/benchmark.py        # requires: pip install polars scipy
 octave --no-gui octave/benchmark.m
 python3 numba_bench/benchmark.py          # requires: pip install numba>=0.55
+python3 python_jax/benchmark.py           # requires: pip install jax
 Rscript r/benchmark.R
 ~/.juliaup/bin/julia julia/benchmark.jl
 ./rust/target/release/benchmark          # after building
@@ -31,6 +32,19 @@ python3 generate_report.py
 ```
 
 ## Building compiled languages
+
+**C** (requires clang + macOS SDK):
+```bash
+clang -O3 -march=native -framework Accelerate -DACCELERATE_NEW_LAPACK \
+    -Wno-deprecated-declarations \
+    -o c/c-bench c/benchmark.c -lm
+```
+
+**Fortran** (requires `brew install gcc`):
+```bash
+gfortran -O3 -march=native -framework Accelerate \
+    -o fortran/fortran-bench fortran/benchmark.f90
+```
 
 **Rust** (requires `~/.cargo/bin/cargo`):
 ```bash
@@ -123,10 +137,13 @@ Key dicts that drive rendering — edit these when adding/changing languages:
 | Julia    | `@allocated` total bytes |
 | Rust     | Custom `GlobalAlloc` peak tracker |
 | C++      | Theoretical output-matrix size (Eigen calls `malloc` directly) |
+| C        | Theoretical output-matrix size (malloc directly) |
+| Fortran  | Theoretical output-matrix size (ALLOCATE/LAPACK directly) |
 | Haskell  | `GHC.Stats.allocated_bytes` delta |
 | Swift    | Theoretical output-matrix size (same rationale as C++) |
 | Go       | `runtime.TotalAlloc` delta (cumulative bytes allocated) |
 | Numba    | `tracemalloc` peak (Python-managed heap; output arrays via NumPy) |
+| Python (JAX) | Theoretical output size (XLA allocations bypass tracemalloc) |
 
 ### Performance context
 
