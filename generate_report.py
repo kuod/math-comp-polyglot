@@ -1150,6 +1150,99 @@ def generate_html(data: dict) -> str:
   <h2>Appendix — Changelog</h2>
   <ul class="chg-list">
     <li class="chg-item">
+      <span class="chg-date">2026-06-03</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-new">new</span>
+        <strong>Added Python (JAX), C, and Fortran — now 15 languages</strong><br>
+        <strong>Python (JAX)</strong> runs all 11 operations (Sort excluded — see below)
+        through JAX's XLA JIT compiler. Three warmup iterations trigger compilation;
+        subsequent runs use the cached XLA executable.
+        <code>jax.block_until_ready()</code> ensures async dispatch completes before
+        the timer stops. Memory is theoretical (XLA allocations bypass
+        <code>tracemalloc</code>).<br>
+        <strong>C</strong> uses Apple Accelerate throughout: <code>cblas_dgemm</code>
+        for matmul, <code>dgetrf/dgetri/dsyev/dpotrf/dgesdd/dgesv/dgeqrf</code> for
+        decompositions, <code>vDSP_fft_zripD</code> for FFT, and
+        <code>qsort</code> for sort. Memory is theoretical.<br>
+        <strong>Fortran</strong> calls the same Accelerate BLAS/LAPACK routines via
+        the Fortran interface. FFT is omitted (no standard Fortran FFT intrinsic);
+        Sort uses a hand-written median-of-three quicksort.
+        Memory is theoretical.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-06-03</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>C FFT: vDSP_ctozD stride IC=2 → IC=1</strong><br>
+        <code>vDSP_ctozD</code> takes its input stride in units of
+        <code>DSPDoubleComplex</code> (2 doubles). The original stride of 2 read
+        every other complex pair — <code>x[0,1]</code>, <code>x[4,5]</code>,
+        <code>x[8,9]</code>… — silently skipping half the input.
+        The FFT was operating on decimated data with wrong frequencies and magnitudes.
+        Fixed to IC=1 (consecutive complex pairs: <code>x[0,1]</code>,
+        <code>x[2,3]</code>, <code>x[4,5]</code>…).
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-06-03</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Fortran: sort name corrected; Linear Solve now uses SPD matrix</strong><br>
+        The sort operation was named <code>"Sort"</code> instead of
+        <code>"Sort 10M floats"</code>, causing the report to create a phantom
+        13th column where Fortran competed alone (winning rank 1 automatically)
+        while being absent from the real sort column. Fixed to match all other
+        languages.<br>
+        The Linear System Solve was using a plain random matrix for A; every other
+        language uses an SPD matrix (<code>A = B·Bᵀ + n·I</code>). Fixed — Fortran
+        now builds SPD A via <code>DGEMM('N','T',...)</code> + diagonal shift.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-06-03</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Python (JAX) Sort omitted — XLA bitonic sort is GPU-optimised</strong><br>
+        <code>jnp.sort</code> uses XLA's bitonic sort algorithm, which is designed
+        for GPU/TPU parallelism and runs ~50× slower on CPU than
+        <code>numpy.sort</code> (~5 900 ms vs ~60–400 ms for other languages).
+        Including it normalised the entire Sort heatmap column to a 0–5 900 ms
+        scale, compressing every other language into an indistinguishable
+        pale-green band. Sort is now omitted for Python (JAX), like FFT for
+        Haskell and FFT for Fortran.
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-06-03</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Octave FFT: post-FFT slice moved outside the timer</strong><br>
+        Octave has no native real-to-complex FFT, so the benchmark ran a full
+        complex <code>fft(v)</code> and sliced the result to N/2+1 outputs.
+        The slice (<code>f = f(1:N_FFT/2+1)</code>) was inside the
+        <code>tic/toc</code> block, adding an ~8 MB array copy to every
+        measurement. Moved outside the timer.
+        Corrected Octave FFT: <strong>~6.9 ms</strong> (was ~70 ms).
+      </span>
+    </li>
+    <li class="chg-item">
+      <span class="chg-date">2026-06-03</span>
+      <span class="chg-body">
+        <span class="chg-tag chg-fix">fix</span>
+        <strong>Report: blas_langs rename, missing CSS rule, stale title tag</strong><br>
+        Three bugs found by automated adversarial review:
+        (1) <code>blas_langs</code> contained the bare string <code>"Python"</code>
+        after the rename to <code>"Python (NumPy)"</code> — all Python variants
+        were silently excluded from the BLAS-tier description in the Executive
+        Summary. (2) The <code>.chg-new</code> CSS class was used in the changelog
+        but never defined, rendering the "new" badge invisible (white text on
+        transparent background). (3) The <code>&lt;title&gt;</code> tag was
+        hardcoded as "8 Languages" while the subtitle already used
+        <code>{{len(langs)}}</code> dynamically; now both are dynamic.
+      </span>
+    </li>
+    <li class="chg-item">
       <span class="chg-date">2026-04-25</span>
       <span class="chg-body">
         <span class="chg-tag chg-new">new</span>
