@@ -6,89 +6,89 @@
     {
       "name": "Matrix Multiply",
       "description": "1000\u00d71000 matrix multiply (jnp.matmul, XLA/JIT)",
-      "mean_ms": 5.598237700000007,
-      "std_ms": 1.3932278662467443,
-      "min_ms": 4.547167000000019,
+      "mean_ms": 5.083870699999993,
+      "std_ms": 0.5836639913486219,
+      "min_ms": 4.63095899999999,
       "memory_mb": 7.62939453125
     },
     {
       "name": "Matrix Inverse",
       "description": "Inversion of 500\u00d7500 SPD matrix (jnp.linalg.inv, XLA/JIT)",
-      "mean_ms": 6.733504299999993,
-      "std_ms": 1.8126280966679382,
-      "min_ms": 4.29979200000008,
+      "mean_ms": 8.920316599999968,
+      "std_ms": 3.4477068669384447,
+      "min_ms": 4.384666999999842,
       "memory_mb": 1.9073486328125
     },
     {
       "name": "LU Decomposition",
       "description": "LU factorisation of 500\u00d7500 matrix (jax.scipy.linalg.lu, XLA/JIT)",
-      "mean_ms": 5.517837500000033,
-      "std_ms": 2.6690068564861886,
-      "min_ms": 2.804459000000037,
+      "mean_ms": 6.004671000000017,
+      "std_ms": 3.1550509518797796,
+      "min_ms": 2.4926670000000595,
       "memory_mb": 1.9073486328125
     },
     {
       "name": "Eigenvalue Decomp",
       "description": "Full eigendecomposition of 300\u00d7300 symmetric matrix (jnp.linalg.eigh, XLA/JIT)",
-      "mean_ms": 19.065258199999956,
-      "std_ms": 15.356869753675472,
-      "min_ms": 5.483082999999889,
+      "mean_ms": 15.406804100000016,
+      "std_ms": 3.828364049845543,
+      "min_ms": 9.736791999999994,
       "memory_mb": 0.688934326171875
     },
     {
       "name": "Cholesky",
       "description": "Cholesky factorisation of 500\u00d7500 SPD matrix (jnp.linalg.cholesky, XLA/JIT)",
-      "mean_ms": 7.964108400000034,
-      "std_ms": 6.246825517563693,
-      "min_ms": 0.589875000000184,
+      "mean_ms": 3.02450839999997,
+      "std_ms": 1.3399876045381025,
+      "min_ms": 1.4898749999998628,
       "memory_mb": 1.9073486328125
     },
     {
       "name": "SVD",
       "description": "Economy SVD of 500\u00d7300 matrix (jnp.linalg.svd, XLA/JIT; U:500\u00d7300)",
-      "mean_ms": 37.810941699999965,
-      "std_ms": 9.851562699631101,
-      "min_ms": 25.308166999999937,
+      "mean_ms": 46.850495800000125,
+      "std_ms": 10.786945061361385,
+      "min_ms": 32.25666600000032,
       "memory_mb": 1.833343505859375
     },
     {
       "name": "Linear System Solve",
       "description": "Solve Ax=b for 1000\u00d71000 A, 1000 b (jnp.linalg.solve, XLA/JIT)",
-      "mean_ms": 59.97753329999997,
-      "std_ms": 124.33345022106958,
-      "min_ms": 11.47816600000029,
+      "mean_ms": 20.46162069999999,
+      "std_ms": 6.022628343423587,
+      "min_ms": 12.434124999999963,
       "memory_mb": 0.00762939453125
     },
     {
       "name": "Vector Dot Product",
       "description": "Dot product of two 10M-element vectors (jnp.dot, XLA/JIT)",
-      "mean_ms": 13.042183300000152,
-      "std_ms": 0.45250209177698925,
-      "min_ms": 12.708083000000592,
+      "mean_ms": 12.948970999999878,
+      "std_ms": 0.10833239039098341,
+      "min_ms": 12.805999999999429,
       "memory_mb": 7.62939453125e-06
     },
     {
       "name": "Hadamard Product",
       "description": "Element-wise multiply + add on 1000\u00d71000 matrices (XLA/JIT)",
-      "mean_ms": 0.6194626999999286,
-      "std_ms": 0.03333852858197907,
-      "min_ms": 0.5421249999999489,
+      "mean_ms": 0.621574900000077,
+      "std_ms": 0.052484504312126,
+      "min_ms": 0.506708000000522,
       "memory_mb": 7.62939453125
     },
     {
       "name": "QR Decomposition",
       "description": "QR factorisation of 500\u00d7500 matrix (jnp.linalg.qr, XLA/JIT)",
-      "mean_ms": 22.838945899999793,
-      "std_ms": 4.515341406548592,
-      "min_ms": 17.109542000000033,
+      "mean_ms": 20.26559150000002,
+      "std_ms": 2.982287570295947,
+      "min_ms": 13.978791000000435,
       "memory_mb": 1.9073486328125
     },
     {
       "name": "FFT (real, 1M)",
       "description": "Real FFT of 2\u00b2\u2070=1M-element vector (jnp.fft.rfft, XLA/JIT)",
-      "mean_ms": 10.071662499999956,
-      "std_ms": 5.8016768299494705,
-      "min_ms": 6.170707999999969,
+      "mean_ms": 10.763837300000032,
+      "std_ms": 5.006647747004708,
+      "min_ms": 6.0046660000008245,
       "memory_mb": 8.0
     }
   ]

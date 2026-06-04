@@ -6,89 +6,89 @@
     {
       "name": "Matrix Multiply",
       "description": "1000x1000 DGEMM (BLAS/Accelerate)",
-      "mean_ms":     6.775800,
-      "std_ms":     0.102849,
-      "min_ms":     6.677000,
+      "mean_ms":     7.130500,
+      "std_ms":     0.253348,
+      "min_ms":     6.907000,
       "memory_mb":     7.629395
     },
     {
       "name": "Matrix Inverse",
       "description": "Inversion of 500x500 SPD matrix (DGETRF+DGETRI/Accelerate)",
-      "mean_ms":     2.387200,
-      "std_ms":     0.069560,
-      "min_ms":     2.343000,
+      "mean_ms":     2.568500,
+      "std_ms":     0.171600,
+      "min_ms":     2.308000,
       "memory_mb":     1.907349
     },
     {
       "name": "LU Decomposition",
       "description": "LU factorisation of 500x500 matrix (DGETRF/Accelerate)",
-      "mean_ms":     1.180600,
-      "std_ms":     0.056262,
-      "min_ms":     1.127000,
+      "mean_ms":     1.236800,
+      "std_ms":     0.135122,
+      "min_ms":     1.121000,
       "memory_mb":     1.907349
     },
     {
       "name": "Eigenvalue Decomp",
       "description": "Full eigendecomposition of 300x300 symmetric matrix (DSYEV/Accelerate)",
-      "mean_ms":    24.147900,
-      "std_ms":     0.235181,
-      "min_ms":    23.838000,
+      "mean_ms":    24.520200,
+      "std_ms":     0.236100,
+      "min_ms":    24.308000,
       "memory_mb":     0.688934
     },
     {
       "name": "Cholesky",
       "description": "Cholesky factorisation of 500x500 SPD matrix (DPOTRF/Accelerate)",
-      "mean_ms":     0.329700,
-      "std_ms":     0.002369,
+      "mean_ms":     0.329500,
+      "std_ms":     0.002579,
       "min_ms":     0.328000,
       "memory_mb":     1.907349
     },
     {
       "name": "SVD",
       "description": "Economy SVD of 500x300 matrix (DGESDD/Accelerate; U:500x300)",
-      "mean_ms":    13.436400,
-      "std_ms":     0.285260,
-      "min_ms":    13.038000,
+      "mean_ms":    13.311300,
+      "std_ms":     0.276850,
+      "min_ms":    13.034000,
       "memory_mb":     1.833344
     },
     {
       "name": "Linear System Solve",
       "description": "Solve Ax=b for 1000x1000 SPD A, 1000 b (DGESV/Accelerate)",
-      "mean_ms":     4.428300,
-      "std_ms":     0.264389,
-      "min_ms":     4.266000,
+      "mean_ms":     4.432000,
+      "std_ms":     0.148015,
+      "min_ms":     4.238000,
       "memory_mb":     0.007629
     },
     {
       "name": "Vector Dot Product",
       "description": "Dot product of two 10M-element vectors (DDOT/Accelerate)",
-      "mean_ms":     3.187500,
-      "std_ms":     0.690001,
-      "min_ms":     2.609000,
+      "mean_ms":     2.963800,
+      "std_ms":     0.492536,
+      "min_ms":     2.658000,
       "memory_mb":     0.000008
     },
     {
       "name": "Hadamard Product",
       "description": "Element-wise multiply + add on 1000x1000 matrices (Fortran array ops)",
-      "mean_ms":     0.516800,
-      "std_ms":     0.007194,
-      "min_ms":     0.510000,
+      "mean_ms":     0.626400,
+      "std_ms":     0.079890,
+      "min_ms":     0.525000,
       "memory_mb":     7.629395
     },
     {
       "name": "QR Decomposition",
       "description": "QR factorisation of 500x500 matrix (DGEQRF/Accelerate)",
-      "mean_ms":     2.253800,
-      "std_ms":     0.056732,
+      "mean_ms":     2.291400,
+      "std_ms":     0.080773,
       "min_ms":     2.209000,
       "memory_mb":     1.907349
     },
     {
       "name": "Sort 10M floats",
       "description": "Unstable sort of 10M random float64 values (Fortran quicksort)",
-      "mean_ms":  1052.193100,
-      "std_ms":    83.542027,
-      "min_ms":   981.866000,
+      "mean_ms":  1012.088400,
+      "std_ms":    14.210305,
+      "min_ms":  1000.993000,
       "memory_mb":    76.293945
     }
   ]

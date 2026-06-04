@@ -6,97 +6,97 @@
     {
       "name": "Matrix Multiply",
       "description": "1000×1000 dense matrix multiplication (A * B)",
-      "mean_ms": 47.0931374,
-      "std_ms": 2.81623342000308,
-      "min_ms": 43.828542,
+      "mean_ms": 44.303741800000005,
+      "std_ms": 0.3737842759862429,
+      "min_ms": 43.834583,
       "memory_mb": 9.70751953125
     },
     {
       "name": "Matrix Inverse",
       "description": "Inversion of 500×500 SPD matrix",
-      "mean_ms": 37.2484625,
-      "std_ms": 2.0015447061126186,
-      "min_ms": 35.94425,
+      "mean_ms": 35.5186585,
+      "std_ms": 0.3706194148315068,
+      "min_ms": 35.202167,
       "memory_mb": 1.9073486328125
     },
     {
       "name": "LU Decomposition",
       "description": "LU factorisation of 500×500 matrix",
-      "mean_ms": 10.0747376,
-      "std_ms": 0.10144332846195486,
-      "min_ms": 9.953709,
+      "mean_ms": 10.031412399999999,
+      "std_ms": 0.10655240257469524,
+      "min_ms": 9.937166000000001,
       "memory_mb": 0.00762939453125
     },
     {
       "name": "Eigenvalue Decomp",
       "description": "Full eigendecomposition of 300×300 symmetric matrix",
-      "mean_ms": 16.6506666,
-      "std_ms": 0.43912446036931274,
-      "min_ms": 16.368958,
+      "mean_ms": 16.4307209,
+      "std_ms": 0.05961043923584203,
+      "min_ms": 16.351959,
       "memory_mb": 0.6934967041015625
     },
     {
       "name": "Cholesky",
       "description": "Cholesky factorisation of 500×500 SPD matrix",
-      "mean_ms": 4.5372499,
-      "std_ms": 0.03758074813904055,
-      "min_ms": 4.509792,
+      "mean_ms": 4.5429457,
+      "std_ms": 0.025109549482418152,
+      "min_ms": 4.508958000000001,
       "memory_mb": 0.0
     },
     {
       "name": "SVD",
       "description": "Economy SVD of 500×300 matrix (nalgebra thin; U:500×300)",
-      "mean_ms": 54.8809499,
-      "std_ms": 0.21663803589326086,
-      "min_ms": 54.613375,
+      "mean_ms": 55.789725,
+      "std_ms": 1.3036465736349705,
+      "min_ms": 54.636708999999996,
       "memory_mb": 1.8402023315429688
     },
     {
       "name": "Linear System Solve",
       "description": "Solve Ax=b for 1000×1000 A, 1000 b",
-      "mean_ms": 78.5440957,
-      "std_ms": 1.5505115080707423,
-      "min_ms": 77.28275,
+      "mean_ms": 79.4074291,
+      "std_ms": 2.7682200497521334,
+      "min_ms": 77.13054199999999,
       "memory_mb": 0.02288818359375
     },
     {
       "name": "Vector Dot Product",
       "description": "Dot product of two 10M-element vectors",
-      "mean_ms": 3.3338834,
-      "std_ms": 0.689306066759346,
-      "min_ms": 2.823417,
+      "mean_ms": 2.9562957999999995,
+      "std_ms": 0.31834163255936226,
+      "min_ms": 2.699958,
       "memory_mb": 0.0
     },
     {
       "name": "Hadamard Product",
       "description": "Element-wise multiply + add on 1000×1000 matrices",
-      "mean_ms": 1.3008417,
-      "std_ms": 0.8014501760382925,
-      "min_ms": 0.7829170000000001,
+      "mean_ms": 0.9486790999999999,
+      "std_ms": 0.07565248464584623,
+      "min_ms": 0.799166,
       "memory_mb": 7.62939453125
     },
     {
       "name": "QR Decomposition",
       "description": "QR factorisation of 500×500 matrix",
-      "mean_ms": 15.4404001,
-      "std_ms": 0.07335788044164028,
-      "min_ms": 15.291125,
+      "mean_ms": 15.721945999999999,
+      "std_ms": 0.2609492882822258,
+      "min_ms": 15.445042,
       "memory_mb": 0.003814697265625
     },
     {
       "name": "FFT (real, 1M)",
       "description": "Real-to-complex FFT of 2²⁰=1M-element vector (realfft/rustfft, N/2+1 output)",
-      "mean_ms": 4.3329958,
-      "std_ms": 0.1448180279618529,
-      "min_ms": 4.21675,
+      "mean_ms": 4.339879000000001,
+      "std_ms": 0.09393249931307061,
+      "min_ms": 4.232875,
       "memory_mb": 0.0
     },
     {
       "name": "Sort 10M floats",
       "description": "Unstable sort of 10M random float64 values (pdqsort)",
-      "mean_ms": 210.16477519999998,
-      "std_ms": 5.348112535814611,
-      "min_ms": 204.86695899999998,
+      "mean_ms": 205.9409709,
+      "std_ms": 0.38494771201826167,
+      "min_ms": 205.29370899999998,
       "memory_mb": 0.0
     }
   ]

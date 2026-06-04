@@ -6,97 +6,97 @@
     {
       "name": "Matrix Multiply",
       "description": "1000×1000 dense matrix multiplication (A * B)",
-      "mean_ms": 55.0665,
-      "std_ms": 7.44934,
-      "min_ms": 49.461,
+      "mean_ms": 46.3237,
+      "std_ms": 1.25961,
+      "min_ms": 44.7187,
       "memory_mb": 7.62939
     },
     {
       "name": "Matrix Inverse",
       "description": "Inversion of 500×500 SPD matrix",
-      "mean_ms": 10.9443,
-      "std_ms": 1.42365,
-      "min_ms": 9.72129,
+      "mean_ms": 9.55588,
+      "std_ms": 0.206286,
+      "min_ms": 9.32804,
       "memory_mb": 1.90735
     },
     {
       "name": "LU Decomposition",
       "description": "LU factorisation of 500×500 matrix",
-      "mean_ms": 2.901,
-      "std_ms": 0.195125,
-      "min_ms": 2.67992,
+      "mean_ms": 2.64122,
+      "std_ms": 0.0198778,
+      "min_ms": 2.62858,
       "memory_mb": 1.90735
     },
     {
       "name": "Eigenvalue Decomp",
       "description": "Full eigendecomposition of 300×300 symmetric matrix",
-      "mean_ms": 24.2618,
-      "std_ms": 7.85017,
-      "min_ms": 17.6114,
+      "mean_ms": 16.2835,
+      "std_ms": 0.0701991,
+      "min_ms": 16.179,
       "memory_mb": 0.688934
     },
     {
       "name": "Cholesky",
       "description": "Cholesky factorisation of 500×500 SPD matrix",
-      "mean_ms": 3.65722,
-      "std_ms": 2.15528,
-      "min_ms": 1.53371,
+      "mean_ms": 1.44859,
+      "std_ms": 0.0247462,
+      "min_ms": 1.4235,
       "memory_mb": 1.90735
     },
     {
       "name": "SVD",
-      "description": "Full SVD of 500×300 matrix",
-      "mean_ms": 31.8219,
-      "std_ms": 4.65848,
-      "min_ms": 28.4123,
+      "description": "Economy SVD of 500×300 matrix (ComputeThinU|ComputeThinV; U:500×300)",
+      "mean_ms": 25.8918,
+      "std_ms": 0.685243,
+      "min_ms": 25.2998,
       "memory_mb": 1.83334
     },
     {
       "name": "Linear System Solve",
       "description": "Solve Ax=b for 1000×1000 A, 1000 b",
-      "mean_ms": 10.1277,
-      "std_ms": 0.64628,
-      "min_ms": 9.38204,
+      "mean_ms": 10.9675,
+      "std_ms": 4.95059,
+      "min_ms": 8.93742,
       "memory_mb": 0.00762939
     },
     {
       "name": "Vector Dot Product",
       "description": "Dot product of two 10M-element vectors",
-      "mean_ms": 3.24202,
-      "std_ms": 0.402687,
-      "min_ms": 2.73071,
+      "mean_ms": 2.87501,
+      "std_ms": 0.184324,
+      "min_ms": 2.70679,
       "memory_mb": 7.62939e-06
     },
     {
       "name": "Hadamard Product",
       "description": "Element-wise multiply + add on 1000×1000 matrices",
-      "mean_ms": 0.946679,
-      "std_ms": 0.153104,
-      "min_ms": 0.796833,
+      "mean_ms": 0.812454,
+      "std_ms": 0.121079,
+      "min_ms": 0.714333,
       "memory_mb": 7.62939
     },
     {
       "name": "QR Decomposition",
       "description": "QR factorisation of 500×500 matrix",
-      "mean_ms": 6.29812,
-      "std_ms": 0.1897,
-      "min_ms": 6.08671,
+      "mean_ms": 6.01269,
+      "std_ms": 0.0604949,
+      "min_ms": 5.942,
       "memory_mb": 1.90735
     },
     {
       "name": "FFT (real, 1M)",
       "description": "Real FFT of 2^20=1M-element vector (Eigen::FFT / KissFFT)",
-      "mean_ms": 17.7106,
-      "std_ms": 0.510944,
-      "min_ms": 16.7308,
+      "mean_ms": 19.4369,
+      "std_ms": 1.16576,
+      "min_ms": 18.0033,
       "memory_mb": 8.00002
     },
     {
       "name": "Sort 10M floats",
       "description": "Unstable sort of 10M random float64 values (std::sort)",
-      "mean_ms": 299.064,
-      "std_ms": 47.745,
-      "min_ms": 263.796,
+      "mean_ms": 262.721,
+      "std_ms": 4.3029,
+      "min_ms": 256.72,
       "memory_mb": 0
     }
   ]
