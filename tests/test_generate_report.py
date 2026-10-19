@@ -30,3 +30,28 @@ def test_scores_basic_ranking():
     table = _table({"A": {"x": 5}, "B": {"x": 1}, "C": {"x": 3}})
     s = gr.compute_golf_scores(["A", "B", "C"], ["x"], table, "mean_ms")
     assert s == {"B": 1, "C": 2, "A": 3}
+
+
+def _write(d, name, doc):
+    (d / name).write_text(doc if isinstance(doc, str) else json.dumps(doc))
+
+
+def test_load_results_skips_malformed_and_invalid(tmp_path, capsys):
+    good = {"language": "Go", "operations": [_op("x", 1.0)]}
+    _write(tmp_path, "go_results.json", "{bad")
+    _write(tmp_path, "rust_results.json", {"operations": [{"name": "x"}]})
+    _write(tmp_path, "cpp_results.json", {"operations": [_op("x", float("nan"))]})
+    _write(tmp_path, "swift_results.json", {"operations": []})
+    _write(tmp_path, "julia_results.json", good)
+    data = gr.load_results(tmp_path)
+    assert list(data) == ["Julia"]
+    err = capsys.readouterr().err
+    for f in ("go_results", "rust_results", "cpp_results", "swift_results"):
+        assert f in err
+
+
+def test_committed_results_are_valid_and_report_builds():
+    data = gr.load_results()
+    assert len(data) == len(gr.FILE_MAP)
+    html = gr.generate_html(data)
+    assert "<html" in html

@@ -170,13 +170,42 @@ FILE_MAP = {
 }
 
 
-def load_results():
+_OP_FIELDS = ("mean_ms", "std_ms", "min_ms", "memory_mb")
+
+
+def _validate_result(d):
+    """Return an error string if `d` is not a valid results document, else None."""
+    if not isinstance(d, dict) or not isinstance(d.get("operations"), list) or not d["operations"]:
+        return "missing non-empty 'operations' list"
+    for i, op in enumerate(d["operations"]):
+        if not isinstance(op, dict) or "name" not in op:
+            return f"operations[{i}] has no 'name'"
+        for k in _OP_FIELDS:
+            v = op.get(k)
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+                return f"operations[{i}] ({op['name']}): '{k}' missing or not a finite number"
+        op.setdefault("description", "")
+    return None
+
+
+def load_results(results_dir=None):
+    results_dir = Path(results_dir) if results_dir is not None else RESULTS_DIR
     data = {}
     for lang, fname in FILE_MAP.items():
-        path = RESULTS_DIR / fname
-        if path.exists():
+        path = results_dir / fname
+        if not path.exists():
+            continue
+        try:
             with open(path) as f:
-                data[lang] = json.load(f)
+                doc = json.load(f)
+        except (OSError, ValueError) as e:
+            print(f"WARNING: skipping {fname}: {e}", file=sys.stderr)
+            continue
+        err = _validate_result(doc)
+        if err:
+            print(f"WARNING: skipping {fname}: {err}", file=sys.stderr)
+            continue
+        data[lang] = doc
     return data
 
 
