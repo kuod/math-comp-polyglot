@@ -10,9 +10,8 @@ rust/target/
 # Haskell build artifacts
 haskell/dist-newstyle/
 
-# Go module cache
+# Go build output
 go/pkg/
-go/go.sum
 
 # Python
 __pycache__/
