@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark 10 numerical operations using NumPy."""
+"""Benchmark 12 numerical operations using NumPy."""
 
 import numpy as np
 import json

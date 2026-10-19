@@ -1,0 +1,10 @@
+# Python dependencies for the Python benchmarks. Lower bounds match the
+# versions the committed results were produced/checked with; pin exact
+# versions (pip freeze) when you need bit-for-bit reproducibility.
+numpy>=2.0
+scipy>=1.13
+pandas>=2.2
+polars>=1.0
+numba>=0.60        # needs np.fft.rfft support in @njit (>=0.55)
+jax>=0.4           # optional; only for python_jax/benchmark.py
+pytest>=8          # tests only

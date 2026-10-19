@@ -170,13 +170,42 @@ FILE_MAP = {
 }
 
 
-def load_results():
+_OP_FIELDS = ("mean_ms", "std_ms", "min_ms", "memory_mb")
+
+
+def _validate_result(d):
+    """Return an error string if `d` is not a valid results document, else None."""
+    if not isinstance(d, dict) or not isinstance(d.get("operations"), list) or not d["operations"]:
+        return "missing non-empty 'operations' list"
+    for i, op in enumerate(d["operations"]):
+        if not isinstance(op, dict) or "name" not in op:
+            return f"operations[{i}] has no 'name'"
+        for k in _OP_FIELDS:
+            v = op.get(k)
+            if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v):
+                return f"operations[{i}] ({op['name']}): '{k}' missing or not a finite number"
+        op.setdefault("description", "")
+    return None
+
+
+def load_results(results_dir=None):
+    results_dir = Path(results_dir) if results_dir is not None else RESULTS_DIR
     data = {}
     for lang, fname in FILE_MAP.items():
-        path = RESULTS_DIR / fname
-        if path.exists():
+        path = results_dir / fname
+        if not path.exists():
+            continue
+        try:
             with open(path) as f:
-                data[lang] = json.load(f)
+                doc = json.load(f)
+        except (OSError, ValueError) as e:
+            print(f"WARNING: skipping {fname}: {e}", file=sys.stderr)
+            continue
+        err = _validate_result(doc)
+        if err:
+            print(f"WARNING: skipping {fname}: {err}", file=sys.stderr)
+            continue
+        data[lang] = doc
     return data
 
 
@@ -203,6 +232,27 @@ def fmt(val, decimals=2):
     if val < 0.01:
         return f"{val:.4f}"
     return f"{val:.{decimals}f}"
+
+
+def compute_golf_scores(langs, op_names, op_table, key):
+    """Sum of per-op ranks (1 = best, lower total wins).
+
+    A language that has no result for an op is charged (participants + 1) for
+    it, so skipping an op can never improve its total.
+    """
+    scores = {lang: 0 for lang in langs}
+    for op in op_names:
+        participating = sorted(
+            (op_table[l][op][key], l) for l in langs if op in op_table.get(l, {})
+        )
+        ranked = set()
+        for rank, (_, l) in enumerate(participating, start=1):
+            scores[l] += rank
+            ranked.add(l)
+        for l in langs:
+            if l not in ranked:
+                scores[l] += len(participating) + 1
+    return scores
 
 
 def generate_html(data: dict) -> str:
@@ -397,30 +447,14 @@ def generate_html(data: dict) -> str:
     op_cards_html = "\n".join(op_cards)
 
     # ── Golf-style scores: rank each lang per op (1=fastest), sum ranks ──────
-    # Langs missing an op are excluded from that op's ranking (no penalty).
-    golf_scores = {lang: 0 for lang in langs}
-    for op in op_names:
-        participating = [
-            (op_table[l][op]["mean_ms"], l)
-            for l in langs if op in op_table.get(l, {})
-        ]
-        participating.sort()          # ascending by time
-        for rank, (_, l) in enumerate(participating, start=1):
-            golf_scores[l] += rank
+    # Langs missing an op receive worst+1 for that op (see golf_scores()).
+    golf_scores = compute_golf_scores(langs, op_names, op_table, "mean_ms")
 
     # Sort langs by golf score (ascending = better) for the leaderboard
     ranked_langs = sorted(langs, key=lambda l: golf_scores[l])
 
     # ── Memory golf scores: rank each lang per op by memory_mb ───────────────
-    mem_golf_scores = {lang: 0 for lang in langs}
-    for op in op_names:
-        participating_mem = [
-            (op_table[l][op]["memory_mb"], l)
-            for l in langs if op in op_table.get(l, {})
-        ]
-        participating_mem.sort()      # ascending by memory
-        for rank, (_, l) in enumerate(participating_mem, start=1):
-            mem_golf_scores[l] += rank
+    mem_golf_scores = compute_golf_scores(langs, op_names, op_table, "memory_mb")
 
     mem_ranked_langs = sorted(langs, key=lambda l: mem_golf_scores[l])
 
@@ -549,8 +583,8 @@ def generate_html(data: dict) -> str:
   <h2>Leaderboard — Golf Scoring (1st = 1 pt · lowest score wins)</h2>
   <p style="font-size:.85rem;color:#666;margin-bottom:1.5rem">
     Each cell shows a language's finishing position for that operation.
-    Scores are summed across all operations. Languages missing an operation (Haskell/FFT)
-    are excluded from that op's ranking and receive no penalty points.
+    Scores are summed across all operations. Languages with no result for an operation (Fortran/FFT, Haskell/FFT, JAX/Sort)
+    are charged one point more than the last-placed language for that op.
   </p>
 
   <h3 style="margin-bottom:.5rem">⚡ Speed Ranking</h3>
@@ -673,9 +707,10 @@ def generate_html(data: dict) -> str:
         {"<li><strong>Rust near-zero memory</strong> for " + rust_zero_str +
           ": nalgebra performs these factorisations in-place on the moved input, so no extra allocation is needed — correct behaviour, not a gap in measurement.</li>"
           if rust_zero_str else ""}
-        <li><strong>Haskell</strong> is excluded from FFT (shows —): the
-          vector-fftw library uses CDouble rather than Haskell Double, making
-          a safe, comparable benchmark impractical.</li>
+        <li><strong>Haskell</strong> and <strong>Fortran</strong> have no FFT result
+          (shown as —): Haskell's vector-fftw uses CDouble rather than Double,
+          and Fortran has no standard FFT intrinsic. <strong>Python (JAX)</strong>
+          has no Sort result.</li>
         <li><strong>Go/gonum</strong> scores last: gonum is a pure-Go library
           with no LAPACK linkage, resulting in the highest scores across the
           board on dense linear algebra.</li>
@@ -753,7 +788,7 @@ def generate_html(data: dict) -> str:
          "audio/image analysis, spectral methods, and fast polynomial multiplication. "
          "Completely different algorithm class from BLAS. Implementations range from "
          "FFTW (near-optimal, used by Python/NumPy and Julia/FFTW.jl) to RustFFT "
-         "(pure-Rust) and gonum's pure-Go FFT. Haskell is excluded (N/A)."),
+         "(pure-Rust) and gonum's pure-Go FFT. Haskell and Fortran have no FFT entry (N/A)."),
 
         ("Sort 10M floats", "Unstable sort of 10 million random float64 values",
          "A pure-algorithm, comparison-based sort workload with no linear-algebra "

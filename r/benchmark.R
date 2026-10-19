@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# Benchmark 10 numerical operations in base R + Matrix package
+# Benchmark 12 numerical operations in base R + Matrix package
 
 suppressPackageStartupMessages({
   library(Matrix)

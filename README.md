@@ -30,9 +30,13 @@ Matrix Multiply · Matrix Inverse · LU Decomposition · Eigenvalue Decomp · Ch
 
 ## Running
 
+Prerequisites: macOS on Apple Silicon, `pip install -r requirements.txt`, plus whichever of the other toolchains you want (Octave, R, Julia, Rust, Eigen, GHC/cabal, Go, gfortran; Swift and clang come with the Xcode Command Line Tools). Languages whose toolchain is missing are skipped.
+
 ```bash
 ./run_all.sh        # run all languages and regenerate report
 python3 generate_report.py  # regenerate report from existing results
 ```
+
+`results/*.json` and `index.html` (the GitHub Pages report) are tracked in git; re-run and commit both together.
 
 See [CLAUDE.md](CLAUDE.md) for per-language build instructions.
