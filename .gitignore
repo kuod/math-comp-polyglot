@@ -2,6 +2,8 @@
 cpp/build_benchmark
 swift/swift-bench
 go/go-bench
+c/c-bench
+fortran/fortran-bench
 go/go
 rust/target/
 
@@ -9,7 +11,13 @@ rust/target/
 haskell/dist-newstyle/
 
 # Go module cache
+go/pkg/
 go/go.sum
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
 
 # macOS
 .DS_Store

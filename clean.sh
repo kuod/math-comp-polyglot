@@ -49,6 +49,14 @@ remove_dir  "$ROOT/go/pkg"                 "Go module cache (go build)"
 remove_file "$ROOT/cpp/build_benchmark"    "C++ compiled binary"
 remove_file "$ROOT/swift/swift-bench"      "Swift compiled binary"
 remove_file "$ROOT/go/go-bench"            "Go compiled binary"
+remove_file "$ROOT/c/c-bench"              "C compiled binary"
+remove_file "$ROOT/fortran/fortran-bench"  "Fortran compiled binary"
+remove_file "$ROOT/go/go"                  "stray Go binary"
+
+# Python bytecode caches
+while IFS= read -r d; do
+    remove_dir "$d" "Python bytecode cache"
+done < <(find "$ROOT" -name __pycache__ -type d -not -path "*/.git/*" 2>/dev/null)
 remove_file "$ROOT/index.html"             "Generated report (python3 generate_report.py)"
 
 # results/*.json
