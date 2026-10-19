@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run all language benchmarks and generate the HTML report.
-set -euo pipefail
+# No `set -e`: one failing language must not abort the others or the report.
+set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 RESULTS="$ROOT/results"
@@ -9,40 +10,53 @@ mkdir -p "$RESULTS"
 log()  { echo "[run_all] $*"; }
 skip() { echo "[run_all] SKIP – $*"; }
 
+FAILED=()
+# run_step <label> <cmd...>: run a command; on failure record it and continue.
+run_step() {
+    local label="$1"; shift
+    if ! "$@"; then
+        echo "[run_all] FAILED – $label" >&2
+        FAILED+=("$label")
+        return 1
+    fi
+}
+# Python scripts need numpy+scipy in addition to their own library.
+py_has() { python3 -c "import numpy, scipy, $1" &>/dev/null; }
+
 # ── Python (NumPy) ────────────────────────────────────────────────────────────
-if command -v python3 &>/dev/null; then
+if command -v python3 &>/dev/null && py_has numpy; then
     log "Running Python (NumPy) benchmark..."
     cd "$ROOT"
-    python3 python/benchmark.py
+    run_step "Python (NumPy)" python3 python/benchmark.py
 else
-    skip "python3 not found"
+    skip "python3 with numpy+scipy not found (pip install numpy scipy)"
 fi
 
 # ── Python (Pandas) ───────────────────────────────────────────────────────────
-if command -v python3 &>/dev/null && python3 -c "import pandas" &>/dev/null 2>&1; then
+if command -v python3 &>/dev/null && py_has pandas; then
     log "Running Python (Pandas) benchmark..."
     cd "$ROOT"
-    python3 python_pandas/benchmark.py
+    run_step "Python (Pandas)" python3 python_pandas/benchmark.py
 else
-    skip "pandas not importable (pip install pandas)"
+    skip "pandas not importable (pip install pandas scipy)"
 fi
 
 # ── Python (Polars) ───────────────────────────────────────────────────────────
-if command -v python3 &>/dev/null && python3 -c "import polars" &>/dev/null 2>&1; then
+if command -v python3 &>/dev/null && py_has polars; then
     log "Running Python (Polars) benchmark..."
     cd "$ROOT"
-    python3 python_polars/benchmark.py
+    run_step "Python (Polars)" python3 python_polars/benchmark.py
 else
-    skip "polars not importable (pip install polars)"
+    skip "polars not importable (pip install polars scipy)"
 fi
 
 # ── Numba ─────────────────────────────────────────────────────────────────────
-if command -v python3 &>/dev/null && python3 -c "import numba" &>/dev/null 2>&1; then
+if command -v python3 &>/dev/null && py_has numba; then
     log "Running Numba benchmark..."
     cd "$ROOT"
-    python3 numba_bench/benchmark.py
+    run_step "Python (Numba)" python3 numba_bench/benchmark.py
 else
-    skip "numba not importable (pip install numba)"
+    skip "numba not importable (pip install numba scipy)"
 fi
 
 # ── R ─────────────────────────────────────────────────────────────────────────
@@ -51,7 +65,7 @@ if command -v Rscript &>/dev/null; then
     cd "$ROOT"
     # Ensure jsonlite is installed
     Rscript -e 'if(!requireNamespace("jsonlite",quietly=TRUE)) install.packages("jsonlite",repos="https://cloud.r-project.org")'
-    Rscript r/benchmark.R
+    run_step "R" Rscript r/benchmark.R
 else
     skip "Rscript not found"
 fi
@@ -72,7 +86,7 @@ if [ -n "$JULIA_BIN" ]; then
     log "Running Julia benchmark ($JULIA_BIN)..."
     cd "$ROOT"
     "$JULIA_BIN" -e 'import Pkg; Pkg.add(["JSON3","FFTW"])' 2>/dev/null || true
-    "$JULIA_BIN" julia/benchmark.jl
+    run_step "Julia" "$JULIA_BIN" julia/benchmark.jl
 else
     skip "julia not found"
 fi
@@ -88,10 +102,12 @@ done
 if [ -n "$CARGO_BIN" ]; then
     log "Building Rust benchmark (release)..."
     cd "$ROOT/rust"
-    RUSTFLAGS="-C target-cpu=native" "$CARGO_BIN" build --release -q
-    log "Running Rust benchmark..."
+    RUSTFLAGS="-C target-cpu=native" run_step "Rust build" "$CARGO_BIN" build --release -q && {
+        log "Running Rust benchmark..."
+        cd "$ROOT"
+        run_step "Rust" ./rust/target/release/benchmark
+    }
     cd "$ROOT"
-    ./rust/target/release/benchmark
 else
     skip "cargo not found"
 fi
@@ -109,14 +125,15 @@ if command -v c++ &>/dev/null; then
         SDK_FLAGS=""
         SDK=$(xcrun --show-sdk-path 2>/dev/null || true)
         [ -n "$SDK" ] && SDK_FLAGS="-isysroot $SDK -I$SDK/usr/include/c++/v1"
-        c++ -std=c++17 -O3 -march=native \
+        run_step "C++ build" c++ -std=c++17 -O3 -march=native \
             -I"$EIGEN_INC" $SDK_FLAGS \
             -Wno-deprecated-declarations \
             -o "$ROOT/cpp/build_benchmark" \
-            "$ROOT/cpp/benchmark.cpp"
-        log "Running C++ benchmark..."
-        cd "$ROOT"
-        ./cpp/build_benchmark
+            "$ROOT/cpp/benchmark.cpp" && {
+            log "Running C++ benchmark..."
+            cd "$ROOT"
+            run_step "C++" ./cpp/build_benchmark
+        }
     fi
 else
     skip "c++ compiler not found"
@@ -131,7 +148,7 @@ if command -v cabal &>/dev/null && command -v ghc &>/dev/null; then
     if [ -n "$BIN" ] && [ -x "$BIN" ]; then
         log "Running Haskell benchmark..."
         cd "$ROOT"
-        "$BIN"
+        run_step "Haskell" "$BIN"
     else
         skip "Haskell binary not found after build"
     fi
@@ -142,13 +159,14 @@ fi
 # ── Swift ─────────────────────────────────────────────────────────────────────
 if command -v swiftc &>/dev/null; then
     log "Building Swift benchmark..."
-    swiftc -O -whole-module-optimization \
+    run_step "Swift build" swiftc -O -whole-module-optimization \
         -sdk "$(xcrun --show-sdk-path)" \
         -o "$ROOT/swift/swift-bench" \
-        "$ROOT/swift/Sources/main.swift"
-    log "Running Swift benchmark..."
-    cd "$ROOT"
-    ./swift/swift-bench
+        "$ROOT/swift/Sources/main.swift" && {
+        log "Running Swift benchmark..."
+        cd "$ROOT"
+        run_step "Swift" ./swift/swift-bench
+    }
 else
     skip "swiftc not found"
 fi
@@ -164,19 +182,21 @@ done
 if [ -n "$GO_BIN" ]; then
     log "Building Go benchmark..."
     cd "$ROOT/go"
-    "$GO_BIN" build -o go-bench .
-    log "Running Go benchmark..."
+    run_step "Go build" "$GO_BIN" build -o go-bench . && {
+        log "Running Go benchmark..."
+        cd "$ROOT"
+        run_step "Go" ./go/go-bench
+    }
     cd "$ROOT"
-    ./go/go-bench
 else
     skip "go not found"
 fi
 
 # ── Python (JAX) ─────────────────────────────────────────────────────────────
-if command -v python3 &>/dev/null && python3 -c "import jax" &>/dev/null 2>&1; then
+if command -v python3 &>/dev/null && py_has jax; then
     log "Running Python (JAX) benchmark..."
     cd "$ROOT"
-    python3 python_jax/benchmark.py
+    run_step "Python (JAX)" python3 python_jax/benchmark.py
 else
     skip "jax not importable (pip install jax)"
 fi
@@ -184,12 +204,13 @@ fi
 # ── C (Accelerate) ───────────────────────────────────────────────────────────
 if command -v clang &>/dev/null; then
     log "Building C benchmark..."
-    clang -O3 -march=native -framework Accelerate -DACCELERATE_NEW_LAPACK \
+    run_step "C build" clang -O3 -march=native -framework Accelerate -DACCELERATE_NEW_LAPACK \
         -Wno-deprecated-declarations \
-        -o "$ROOT/c/c-bench" "$ROOT/c/benchmark.c" -lm
-    log "Running C benchmark..."
-    cd "$ROOT"
-    ./c/c-bench
+        -o "$ROOT/c/c-bench" "$ROOT/c/benchmark.c" -lm && {
+        log "Running C benchmark..."
+        cd "$ROOT"
+        run_step "C" ./c/c-bench
+    }
 else
     skip "clang not found"
 fi
@@ -204,11 +225,12 @@ done
 
 if [ -n "$GFORTRAN_BIN" ]; then
     log "Building Fortran benchmark..."
-    "$GFORTRAN_BIN" -O3 -march=native -framework Accelerate \
-        -o "$ROOT/fortran/fortran-bench" "$ROOT/fortran/benchmark.f90"
-    log "Running Fortran benchmark..."
-    cd "$ROOT"
-    ./fortran/fortran-bench
+    run_step "Fortran build" "$GFORTRAN_BIN" -O3 -march=native -framework Accelerate \
+        -o "$ROOT/fortran/fortran-bench" "$ROOT/fortran/benchmark.f90" && {
+        log "Running Fortran benchmark..."
+        cd "$ROOT"
+        run_step "Fortran" ./fortran/fortran-bench
+    }
 else
     skip "gfortran not found (brew install gcc)"
 fi
@@ -217,7 +239,7 @@ fi
 if command -v octave &>/dev/null; then
     log "Running Octave benchmark..."
     cd "$ROOT"
-    octave --no-gui octave/benchmark.m
+    run_step "Octave" octave --no-gui octave/benchmark.m
 else
     skip "octave not found (brew install octave)"
 fi
@@ -225,6 +247,10 @@ fi
 # ── Generate HTML report ──────────────────────────────────────────────────────
 log "Generating HTML report..."
 cd "$ROOT"
-python3 generate_report.py
+run_step "Report generation" python3 generate_report.py
 
+if [ ${#FAILED[@]} -gt 0 ]; then
+    log "Done with failures: ${FAILED[*]}"
+    exit 1
+fi
 log "Done! Open index.html in your browser."
