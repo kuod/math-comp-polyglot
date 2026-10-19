@@ -1,5 +1,5 @@
 #!/usr/bin/env julia
-# Benchmark 10 numerical operations in Julia (LinearAlgebra stdlib)
+# Benchmark 12 numerical operations in Julia (LinearAlgebra stdlib)
 
 using LinearAlgebra
 using Random

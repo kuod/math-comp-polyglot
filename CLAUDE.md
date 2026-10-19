@@ -31,6 +31,16 @@ $(cd haskell && cabal list-bin haskell-bench)  # after building
 python3 generate_report.py
 ```
 
+## Setup and tests
+
+```bash
+pip install -r requirements.txt   # Python deps (scipy is needed by all Python benchmarks)
+python3 -m pytest tests            # report generator unit tests
+bash tests/test_run_all.sh         # run_all.sh failure-handling test
+```
+
+`generate_report.py` skips (with a warning) result files that are not valid JSON or lack required fields. `run_all.sh` continues past failing languages, still builds the report, and exits non-zero listing the failed steps.
+
 ## Building compiled languages
 
 **C** (requires clang + macOS SDK):
@@ -65,7 +75,7 @@ c++ -std=c++17 -O3 -march=native \
 ```bash
 cd haskell && cabal build
 ```
-Dependencies are fetched from Hackage on first build. `hmatrix` links against system BLAS/LAPACK (Accelerate on macOS). Haskell does not implement FFT (shows `—` in the report) — `vector-fftw` uses `CDouble` rather than `Double`, making a safe benchmark impractical.
+Dependencies are fetched from Hackage on first build. `hmatrix` links against system BLAS/LAPACK (Accelerate on macOS). Haskell does not implement FFT (shows `—` in the report; Fortran also omits FFT and Python (JAX) omits Sort) — `vector-fftw` uses `CDouble` rather than `Double`, making a safe benchmark impractical.
 
 **Swift** (ships with Xcode Command Line Tools on macOS):
 ```bash
@@ -89,7 +99,7 @@ Uses `gonum.org/v1/gonum` (pure Go, no external LAPACK).
 <lang>/benchmark.<ext>  →  results/<lang>_results.json  →  generate_report.py  →  index.html
 ```
 
-`results/` and `index.html` are generated outputs and should not be committed.
+`results/*.json` and `index.html` are generated outputs, but they ARE tracked on purpose: `index.html` is the GitHub Pages site and `results/` is the data it is built from. Regenerate and commit them together after re-running benchmarks. Build artifacts (binaries, `__pycache__`) are gitignored; `./clean.sh` removes them.
 
 ### JSON schema (each `results/*.json`)
 ```json
@@ -116,7 +126,7 @@ The report is one self-contained HTML file built in `generate_html()`. Sections 
 | Section | What it is |
 |---------|------------|
 | Executive Summary | Data-driven highlights: winner, gold medals per op, two performance tiers, notable findings |
-| Leaderboard | Golf-scoring table — rank per op (1 = fastest), summed; lowest total wins. Langs missing an op (Haskell/FFT) are excluded from that op's ranking with no penalty |
+| Leaderboard | Golf-scoring table — rank per op (1 = fastest), summed; lowest total wins. Langs missing an op (Haskell/FFT, Fortran/FFT, JAX/Sort) are charged worst+1 for it (`compute_golf_scores`) |
 | Language Summary | Cards sorted by score showing avg time, avg MB, score |
 | Overview Charts | Two grouped bar charts across all ops (time + memory) |
 | Per-Operation: Time vs Memory | One scatter plot per op — x = time (ms), y = memory (MB), one point per language |
@@ -124,7 +134,7 @@ The report is one self-contained HTML file built in `generate_html()`. Sections 
 | Glossary | One card per operation explaining what it computes and what it stresses |
 
 Key dicts that drive rendering — edit these when adding/changing languages:
-- `LANG_META` — color, background, logo emoji
+- `LANG_META` — color, background, chart label, inline SVG logo
 - `FILE_MAP` — maps language name → results JSON filename
 - `LANG_MEMORY_NOTE` — one-line description of memory measurement method
 
@@ -132,7 +142,8 @@ Key dicts that drive rendering — edit these when adding/changing languages:
 
 | Language | Mechanism |
 |----------|-----------|
-| Python   | `tracemalloc` peak (Python-managed heap; large NumPy arrays may be under-counted) |
+| Python (NumPy/Pandas/Polars) | `tracemalloc` peak (Python-managed heap; large NumPy arrays may be under-counted) |
+| Octave   | Theoretical output-matrix size |
 | R        | `gc()` Vcells delta |
 | Julia    | `@allocated` total bytes |
 | Rust     | Custom `GlobalAlloc` peak tracker |

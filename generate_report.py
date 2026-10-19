@@ -707,9 +707,10 @@ def generate_html(data: dict) -> str:
         {"<li><strong>Rust near-zero memory</strong> for " + rust_zero_str +
           ": nalgebra performs these factorisations in-place on the moved input, so no extra allocation is needed — correct behaviour, not a gap in measurement.</li>"
           if rust_zero_str else ""}
-        <li><strong>Haskell</strong> is excluded from FFT (shows —): the
-          vector-fftw library uses CDouble rather than Haskell Double, making
-          a safe, comparable benchmark impractical.</li>
+        <li><strong>Haskell</strong> and <strong>Fortran</strong> have no FFT result
+          (shown as —): Haskell's vector-fftw uses CDouble rather than Double,
+          and Fortran has no standard FFT intrinsic. <strong>Python (JAX)</strong>
+          has no Sort result.</li>
         <li><strong>Go/gonum</strong> scores last: gonum is a pure-Go library
           with no LAPACK linkage, resulting in the highest scores across the
           board on dense linear algebra.</li>
@@ -787,7 +788,7 @@ def generate_html(data: dict) -> str:
          "audio/image analysis, spectral methods, and fast polynomial multiplication. "
          "Completely different algorithm class from BLAS. Implementations range from "
          "FFTW (near-optimal, used by Python/NumPy and Julia/FFTW.jl) to RustFFT "
-         "(pure-Rust) and gonum's pure-Go FFT. Haskell is excluded (N/A)."),
+         "(pure-Rust) and gonum's pure-Go FFT. Haskell and Fortran have no FFT entry (N/A)."),
 
         ("Sort 10M floats", "Unstable sort of 10 million random float64 values",
          "A pure-algorithm, comparison-based sort workload with no linear-algebra "
