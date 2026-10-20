@@ -308,8 +308,9 @@
       <div class="exec-label">Two Performance Tiers</div>
       <p><strong>BLAS/LAPACK-linked</strong> (C, Fortran, Haskell, Julia, Python (JAX), Python (NumPy), Python (Pandas), Python (Polars), R, Swift): call
         hand-optimised vendor routines (Apple Accelerate on this machine) for
-        dense matrix work — typically 5–20× faster than pure implementations on
-        large factorisation benchmarks.</p>
+        dense matrix work — on the factorisation and solver benchmarks the fastest BLAS-linked result is
+        2–5× faster than the fastest pure implementation (best vs best, per
+        operation).</p>
       <p style="margin-top:.5rem"><strong>Pure implementations</strong>
         (C++, Go, Rust): Rust/nalgebra, C++/Eigen, Go/gonum implement
         their own algorithms without calling LAPACK. Slower on BLAS-heavy ops, but
@@ -319,20 +320,20 @@
     <div class="exec-card">
       <div class="exec-label">Notable Findings</div>
       <ul class="exec-list">
-        <li><strong>Swift/Accelerate</strong> dominates factorisation ops
-          (Cholesky, LU, QR) thanks to Apple Silicon-tuned Accelerate — even
-          beating Python/NumPy and Julia on several ops.</li>
-        <li><strong>Sort</strong>: Python (Polars) is fastest; Python (Pandas) and Swift
-          are ~4–5× slower, exposing meaningful differences in standard-library
+        <li><strong>Swift/Accelerate</strong> is at the top on the factorisation ops
+          (Cholesky, LU, QR), tying with C and Fortran (all call Accelerate) and
+          beating Python/NumPy and Julia on each of them.</li>
+        <li><strong>Sort</strong>: Python (Polars) is fastest; Python (Pandas) is ~18×
+          and Swift ~13× slower, exposing meaningful differences in standard-library
           sort implementations at 10M elements.</li>
         <li><strong>Rust near-zero memory</strong> for Cholesky, LU Decomposition, QR Decomposition: nalgebra performs these factorisations in-place on the moved input, so no extra allocation is needed — correct behaviour, not a gap in measurement.</li>
         <li><strong>Haskell</strong> and <strong>Fortran</strong> have no FFT result
           (shown as —): Haskell's vector-fftw uses CDouble rather than Double,
           and Fortran has no standard FFT intrinsic. <strong>Python (JAX)</strong>
           has no Sort result.</li>
-        <li><strong>Go/gonum</strong> scores last: gonum is a pure-Go library
-          with no LAPACK linkage, resulting in the highest scores across the
-          board on dense linear algebra.</li>
+        <li><strong>Go</strong> has the worst overall speed score
+          (summed per-operation ranks). Go/gonum is a pure-Go library with no
+          LAPACK linkage and is slowest on several dense linear algebra ops.</li>
       </ul>
     </div>
 
@@ -763,7 +764,7 @@
           <span class='gloss-best'>0.58 ms</span>
         </div>
         <div class="gloss-sig"><code>C = A ⊙ B + C for three 1000×1000 matrices</code></div>
-        <p class="gloss-text">Element-wise (pointwise) multiply-then-add — not a BLAS operation, so every language must loop over 1M doubles itself. Tests compiler vectorisation (SIMD auto-vectorisation in Rust/C++/Julia) and interpreter overhead (Python, R). Julia and Rust typically win here.</p>
+        <p class="gloss-text">Element-wise (pointwise) multiply-then-add — not a BLAS operation, so every language must loop over 1M doubles itself. Tests compiler vectorisation (SIMD auto-vectorisation in Rust/C++/Julia) and interpreter overhead (Python, R). In the committed results the compiled/JIT languages (C, Fortran, JAX, Numba) tie near 0.6 ms.</p>
       </div>
     </div>
     <div class="gloss-card">

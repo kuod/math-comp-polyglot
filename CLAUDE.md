@@ -17,10 +17,10 @@ python3 python/benchmark.py               # Python (NumPy)
 python3 python_pandas/benchmark.py        # requires: pip install pandas scipy
 python3 python_polars/benchmark.py        # requires: pip install polars scipy
 octave --no-gui octave/benchmark.m
-python3 numba_bench/benchmark.py          # requires: pip install numba>=0.55
+python3 numba_bench/benchmark.py          # requires: pip install -r requirements.txt (numba version bound is there)
 python3 python_jax/benchmark.py           # requires: pip install jax
-Rscript r/benchmark.R
-~/.juliaup/bin/julia julia/benchmark.jl
+Rscript r/benchmark.R                      # run_all.sh auto-installs the R package jsonlite if missing
+~/.juliaup/bin/julia julia/benchmark.jl   # run_all.sh auto-installs Julia pkgs JSON3 and FFTW
 ./rust/target/release/benchmark          # after building
 ./cpp/build_benchmark                    # after building
 $(cd haskell && cabal list-bin haskell-bench)  # after building
@@ -39,7 +39,7 @@ python3 -m pytest tests            # report generator unit tests
 bash tests/test_run_all.sh         # run_all.sh failure-handling test
 ```
 
-`generate_report.py` skips (with a warning) result files that are not valid JSON or lack required fields. `run_all.sh` continues past failing languages, still builds the report, and exits non-zero listing the failed steps.
+`generate_report.py` skips (with a warning) result files that are not valid JSON or lack required fields. `run_all.sh` continues past failing languages, still builds the report, and exits non-zero listing the failed steps. Exception: the Haskell `cabal build` is not wrapped in `run_step` (its output is filtered through grep and `|| true`), so a Haskell build failure is not listed; it surfaces only as a skip ("Haskell binary not found after build") when no binary exists, and a stale binary from an earlier build would be run.
 
 ## Building compiled languages
 

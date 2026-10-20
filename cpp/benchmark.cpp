@@ -1,4 +1,4 @@
-// Benchmark 10 numerical operations using Eigen
+// Benchmark 12 numerical operations using Eigen
 #include <Eigen/Dense>
 #include <Eigen/QR>
 #include <Eigen/LU>

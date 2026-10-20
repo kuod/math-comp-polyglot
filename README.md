@@ -30,7 +30,7 @@ Matrix Multiply · Matrix Inverse · LU Decomposition · Eigenvalue Decomp · Ch
 
 ## Running
 
-Prerequisites: macOS on Apple Silicon, `pip install -r requirements.txt`, plus whichever of the other toolchains you want (Octave, R, Julia, Rust, Eigen, GHC/cabal, Go, gfortran; Swift and clang come with the Xcode Command Line Tools). Languages whose toolchain is missing are skipped.
+Prerequisites: macOS on Apple Silicon, `pip install -r requirements.txt`, plus whichever of the other toolchains you want (Octave, R, Julia, Rust, Eigen, GHC/cabal, Go, gfortran; Swift and clang come with the Xcode Command Line Tools). Languages whose toolchain is missing are skipped. `run_all.sh` auto-installs the Julia packages JSON3 and FFTW and the R package jsonlite if they are missing.
 
 ```bash
 ./run_all.sh        # run all languages and regenerate report

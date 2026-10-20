@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Benchmark 12 numerical operations using Python (JAX) with JIT compilation."""
+"""Benchmark 11 numerical operations (all except Sort) using Python (JAX) with JIT compilation."""
 
 import os
 import json
