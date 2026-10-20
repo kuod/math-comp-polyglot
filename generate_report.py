@@ -626,15 +626,31 @@ def generate_html(data: dict) -> str:
         gold_counts[w] = gold_counts.get(w, 0) + 1
 
     # Fastest BLAS op (Cholesky tends to separate best)
-    chol_winner = op_winners.get("Cholesky", "Swift")
 
     # Sort winner / loser
     sort_op = "Sort 10M floats"
     sort_ordered = sorted(
         [(op_table[l][sort_op]["mean_ms"], l) for l in langs if sort_op in op_table.get(l, {})],
     )
-    sort_winner   = sort_ordered[0][1]  if sort_ordered else "Julia"
-    sort_slowest  = sort_ordered[-1][1] if sort_ordered else "Go"
+    sort_winner   = sort_ordered[0][1]  if sort_ordered else "n/a"
+    sort_slowest  = sort_ordered[-1][1] if sort_ordered else "n/a"
+    sort_t = {l: t for t, l in sort_ordered}
+    def _sort_x(l):
+        return f"~{sort_t[l] / sort_ordered[0][0]:.0f}×" if l in sort_t and sort_ordered[0][0] > 0 else "n/a"
+    sort_slowest_x = _sort_x(sort_slowest)
+    sort_swift_x   = _sort_x("Swift")
+
+    # Speed ratio of best BLAS-linked vs best pure implementation on the
+    # factorisation / solver ops (derived from the data, not hard-coded).
+    tier_ratios = []
+    for _op in ["Matrix Inverse", "LU Decomposition", "Eigenvalue Decomp", "Cholesky",
+                "SVD", "Linear System Solve", "QR Decomposition"]:
+        _b = [op_table[l][_op]["mean_ms"] for l in blas_langs if _op in op_table.get(l, {})]
+        _p = [op_table[l][_op]["mean_ms"] for l in pure_langs if _op in op_table.get(l, {})]
+        if _b and _p and min(_b) > 0:
+            tier_ratios.append(min(_p) / min(_b))
+    tier_str = (f"{min(tier_ratios):.0f}–{max(tier_ratios):.0f}×" if tier_ratios else "n/a")
+    worst_lang = ranked_langs[-1]
 
     # Rust near-zero memory ops
     rust_zero_ops = [op for op in ["Cholesky", "LU Decomposition", "QR Decomposition"]
@@ -687,8 +703,9 @@ def generate_html(data: dict) -> str:
       <div class="exec-label">Two Performance Tiers</div>
       <p><strong>BLAS/LAPACK-linked</strong> ({", ".join(blas_present)}): call
         hand-optimised vendor routines (Apple Accelerate on this machine) for
-        dense matrix work — typically 5–20× faster than pure implementations on
-        large factorisation benchmarks.</p>
+        dense matrix work — on the factorisation and solver benchmarks the fastest BLAS-linked result is
+        {tier_str} faster than the fastest pure implementation (best vs best, per
+        operation).</p>
       <p style="margin-top:.5rem"><strong>Pure implementations</strong>
         ({", ".join(pure_present)}): Rust/nalgebra, C++/Eigen, Go/gonum implement
         their own algorithms without calling LAPACK. Slower on BLAS-heavy ops, but
@@ -698,11 +715,11 @@ def generate_html(data: dict) -> str:
     <div class="exec-card">
       <div class="exec-label">Notable Findings</div>
       <ul class="exec-list">
-        <li><strong>Swift/Accelerate</strong> dominates factorisation ops
-          (Cholesky, LU, QR) thanks to Apple Silicon-tuned Accelerate — even
-          beating Python/NumPy and Julia on several ops.</li>
-        <li><strong>Sort</strong>: {sort_winner} is fastest; {sort_slowest} and Swift
-          are ~4–5× slower, exposing meaningful differences in standard-library
+        <li><strong>Swift/Accelerate</strong> is at the top on the factorisation ops
+          (Cholesky, LU, QR), tying with C and Fortran (all call Accelerate) and
+          beating Python/NumPy and Julia on each of them.</li>
+        <li><strong>Sort</strong>: {sort_winner} is fastest; {sort_slowest} is {sort_slowest_x}
+          and Swift {sort_swift_x} slower, exposing meaningful differences in standard-library
           sort implementations at 10M elements.</li>
         {"<li><strong>Rust near-zero memory</strong> for " + rust_zero_str +
           ": nalgebra performs these factorisations in-place on the moved input, so no extra allocation is needed — correct behaviour, not a gap in measurement.</li>"
@@ -711,9 +728,9 @@ def generate_html(data: dict) -> str:
           (shown as —): Haskell's vector-fftw uses CDouble rather than Double,
           and Fortran has no standard FFT intrinsic. <strong>Python (JAX)</strong>
           has no Sort result.</li>
-        <li><strong>Go/gonum</strong> scores last: gonum is a pure-Go library
-          with no LAPACK linkage, resulting in the highest scores across the
-          board on dense linear algebra.</li>
+        <li><strong>{worst_lang}</strong> has the worst overall speed score
+          (summed per-operation ranks). Go/gonum is a pure-Go library with no
+          LAPACK linkage and is slowest on several dense linear algebra ops.</li>
       </ul>
     </div>
 
@@ -774,7 +791,7 @@ def generate_html(data: dict) -> str:
          "Element-wise (pointwise) multiply-then-add — not a BLAS operation, so every "
          "language must loop over 1M doubles itself. Tests compiler vectorisation "
          "(SIMD auto-vectorisation in Rust/C++/Julia) and interpreter overhead "
-         "(Python, R). Julia and Rust typically win here."),
+         "(Python, R). In the committed results the compiled/JIT languages (C, Fortran, JAX, Numba) tie near 0.6 ms."),
 
         ("QR Decomposition", "Householder QR of a 500×500 matrix (R factor)",
          "QR factorisation (DGEQRF) underpins least-squares solvers, eigenvalue "
